@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+
+    <link rel="stylesheet" href="../../webroot/css/bootstrap.min.css">
+</head>
+
+<body>
+
+    <script type="text/javascript" src="../../webroot/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../webroot/js/popper.min.js"></script>
+    <script type="text/javascript" src="../../webroot/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../webroot/js/includeHtml.js"></script>
+
+    <div w3-include-html="header.html"></div>
+
+    <script>
+        includeHTML();
+    </script>
+    <main role="main">
+        <div class="album py-5 bg-light">
+            <div class="container">
+                <div class="card border-dark mb-3" style="max-width: 80rem;">
+                    <div class="card-header">Recuperar Contraseña</div>
+                        <div class="card-body text-dark">
+                            <h5 class="card-title">Diligencia toda la información</h5><br><br>
+                            <form>
+                                <div class="form-row">
+                                  <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Nueva Contraseña</label>
+                                    <input type="email" class="form-control" id="inputEmail4" placeholder="Nueva Contraseña">
+                                  </div>
+                                  <div class="form-group col-md-6">
+                                    <label for="inputPassword4">Confirmar Nueva Contraseña</label>
+                                    <input type="password" class="form-control" id="inputPassword4" placeholder="Confirmar Nueva Contraseña">
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                  <label for="inputAddress">Token</label>
+                                  <input type="text" class="form-control" id="inputAddress" placeholder="Token">
+                                </div>
+                                <div class="">
+                                    <button type="submit" class="btn btn-primary mr-sm-2">Cambiar Contraseña</button>
+                                    <button type="submit" class="btn btn-primary">Enviar Token Nuevamente</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div w3-include-html="footer.html"></div>
+
+    <script>
+        includeHTML();
+    </script>
+</body>
+
+</html>

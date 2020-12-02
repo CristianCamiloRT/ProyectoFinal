@@ -26,34 +26,39 @@
 		<div class="album py-5 bg-light">
 			<div class="container">
 				<div class="card border-dark mb-3" style="max-width: 80rem;">
-					<div class="card-header">Registro</div>
+					<div class="card-header">Formulario De Registro</div>
 					<div class="card-body text-dark">
-						<h5 class="card-title">Diligencia toda la información</h5>
-						<h5 class="card-title">Los campos con * son obligatorios</h5><br>
+						<h5 class="card-title">Diligencia toda la información <small>(Los campos con <label style="color:#FF0000";>*</label> son obligatorios)</small></h5><br>
 						<form>
-							<div class="form-group">
-								<label for="exampleFormControlInput1">Nombre de usuario *</label>
-								<input type="text" class="form-control" id="input1" placeholder="Nombre de usuario">
+							<div class="form-row">
+								<div class="col-md-12 mb-3">
+									<label for="exampleFormControlInput1">Nombre de usuario <label style="color:#FF0000";>*</label></label>
+									<input type="text" class="form-control" id="input1" placeholder="Nombre de usuario" required>
+								</div>
 							</div>
-							<div class="form-group">
-								<label for="exampleFormControlInput1">Contraseña *</label>
-								<input type="password" class="form-control" id="input2" placeholder="Contraseña">
-							</div>
-							<div class="form-group">
-								<label for="exampleFormControlInput1">Repetir contraseña *</label>
+
+							<div class="form-row">
+								<div class="col-md-6 mb-3">
+									<label for="exampleFormControlInput1">Contraseña <label style="color:#FF0000";>*</label></label>
+								<input type="password" class="form-control" id="input2" placeholder="Contraseña" required>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label for="exampleFormControlInput1">Repetir contraseña <label style="color:#FF0000";>*</label></label>
 								<input type="password" class="form-control" id="input3"
-									placeholder="Repetir contraseña">
+									placeholder="Repetir contraseña" required>
+								</div>
 							</div>
+
 							<div class="form-group">
-								<label for="exampleFormControlInput1">Nombre *</label>
-								<input type="text" class="form-control" id="input4" placeholder="Nombre0">
+								<label for="exampleFormControlInput1">Nombre <label style="color:#FF0000";>*</label></label>
+								<input type="text" class="form-control" id="input4" placeholder="Nombre">
 							</div>
 							<div class="form-group">
 								<label for="exampleFormControlInput1">Apellido</label>
 								<input type="text" class="form-control" id="input5" placeholder="Apellido">
 							</div>
 							<div class="form-group">
-								<label for="exampleFormControlInput1">Correo electonico *</label>
+								<label for="exampleFormControlInput1">Correo electonico <label style="color:#FF0000";>*</label></label>
 								<input type="email" class="form-control" id="input6"
 									placeholder="ejemplo@midominio.com">
 							</div>
@@ -68,8 +73,8 @@
 							<div class="form-group">
 								<label for="exampleFormControlInput1">Fecha de nacimiento</label>
 								<input type="date" class="form-control" id="input2">
-							</div>
-							<button type="submit" class="btn btn-primary">Sign in</button>
+							</div><br>
+							<button type="submit" class="btn btn-primary">Reistrarse</button>
 						</form>
 					</div>
 				</div>
@@ -77,30 +82,7 @@
 		</div>
 		</div>
 	</main>
-	<!--
-	<center>
-		<form action="">
-			<div class="color">
-				<h1>Registro</h1>
-				<p>Los campos marcado con '*' son obligatorios</p>
-			</div>
-			<input type="text" name="username" placeholder="*Nombre de usuario" style="margin-top:35px;"><br>
-			<input type="password" name="pass" placeholder="*Contraseña"><br>
-			<input type="password" name="passValidate" placeholder="*Verifique contraseña"><br>
-			<input type="text" name="nombre" placeholder="*Nombre"><br>
-			<input type="text" name="apellido" placeholder="*Apellido"><br>
-			<input type="text" name="email" placeholder="*Email"><br>
-			<input type="text" name="telefono" placeholder="Telefono"><br>
-			<input type="text" name="profesion" placeholder="Profesion"><br>
-			<div style="height:25px;"></div>
-			<label>Fecha nacimiento</label><br>
-			<input type="date" name="birthdate" placeholder="*Birthdate"><br>
-			<div style="height:10px;"></div>
-			<input type="submit" name="ENVIAR"
-				style="background-color:#3F3C99; color:#FFF; border-radius:20px; width:100px;">
-		</form>
-	</center>
--->
+
 	<div w3-include-html="footer.html"></div>
 
 	<script>
