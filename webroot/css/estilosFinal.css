@@ -1,0 +1,26 @@
+input{
+	width:75%;
+	border-radius:5px;
+	margin-top:15px;
+	height:30px;
+	}
+form{
+	background-color:#EEE;
+	border:2px solid black;
+	border-radius:25px;
+	padding-bottom:25px;
+	margin:100px auto;
+	width: 50%;
+	overflow:hidden;
+	}
+body{
+	background-color:#CAB9FF;
+	}
+.color{
+	background-color:#6241CC;
+	border:2px solid black;
+	margin:-5px;
+	}
+h1{
+	color:#FFF;
+	}
