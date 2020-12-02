@@ -1,21 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir imagen</title>
-    <link rel="stylesheet" href="../../webroot/css/estilosFinal.css">
+    <title>Subir Imagen</title>
+
+    <link rel="stylesheet" href="../../webroot/css/bootstrap.min.css">
 </head>
+
 <body>
-    <h1>Red social</h1>
-    <p>Mis imagenes</p>
-    <p>Configuracion</p>
-    <input type="text" name="buscar" id="buscar" placeholder="Buscar">
-    <input type="button" value="perfil">
-    <img src="../../webroot/img/img10.jpg" alt="">
-    <h2>Informacion sobre la imagen</h2>
-    <input type="text" name="nombreImg" id="nombreImg" placeholder="Nombre imagen">
-    <input type="text" name="tags" id="tags" placeholder="Tags">
-    <input type="checkbox" name="visible" id="visible">Desea mostrar la imagen en la web?
+
+    <script type="text/javascript" src="../../webroot/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../webroot/js/popper.min.js"></script>
+    <script type="text/javascript" src="../../webroot/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../webroot/js/includeHtml.js"></script>
+
+    <div w3-include-html="header.html"></div>
+
+    <script>
+        includeHTML();
+    </script>
+    <main role="main">
+        <div class="album py-5 bg-light">
+            <div class="container">
+                <div class="card border-dark mb-3" style="max-width: 80rem;">
+                    <div class="card-header">Subir Imagen</div>
+                    <div class="card-body text-dark">
+                        <h5 class="card-title">Diligencia toda la información</h5><br><br>
+                        <form>
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="validationDefault01"><b>Titulo Imagen</b></label>
+                                    <input type="text" class="form-control" id="validationDefault01"
+                                        placeholder="Titulo Imagen" value="" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="validationDefault02"><b>Tag's</b> <small> Palabras claves separadas por
+                                            comas (,)</small></label>
+                                    <input type="text" class="form-control" id="validationDefault02" placeholder="Tag's"
+                                        value="" required>
+                                </div>
+                            </div><br>
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-group">
+                                        <label for="exampleFormControlTextarea1"><b>Escribe una descripción de la
+                                                imagen</b></label>
+                                        <textarea class="form-control" id="exampleFormControlTextarea1"
+                                            rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleFormControlFile1"><b>Seleccione imagen a subir</b></label>
+                                <input type="file" class="form-control-file" id="exampleFormControlFile1"
+                                    accept="image/*">
+                            </div><br>
+                            <fieldset class="form-group">
+                                <div class="row">
+                                    <legend class="col-form-label col-sm-2 pt-0"><b>Estado:</b></legend>
+                                    <div class="col-sm-10">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="gridRadios"
+                                                id="gridRadios1" value="option1" checked>
+                                            <label class="form-check-label" for="gridRadios1">
+                                                Publica
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="gridRadios"
+                                                id="gridRadios2" value="option2">
+                                            <label class="form-check-label" for="gridRadios2">
+                                                Privada
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset><br><br>
+
+                            <button class="btn btn-primary" type="submit">Subir Imagen</button>
+                        </form>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div w3-include-html="footer.html"></div>
+
+    <script>
+        includeHTML();
+    </script>
 </body>
+
 </html>
