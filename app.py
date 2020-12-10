@@ -46,9 +46,28 @@ def login():
 def recuperarContra():
     return render_template('recuperarContra.html')
 
-@app.route("/registro", methods=['GET'])
+@app.route("/registro", methods=['POST','GET'])
 def registro():
-    return render_template('registro.html')
+    if (request.method == 'GET'):
+        return render_template('registro.html')
+    elif (request.method == 'POST'):
+        try:
+            passwd = request.form.get('passWd')
+            passco = request.form.get('passConf')
+            if(passwd == passco):
+                m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', passwd)
+                if(m != None ):
+                    flash("registro correcto!")
+                    return render_template('principal.html')
+                else:
+                    flash("La contraseña no cumple con los requisitos exigidos")
+                    return render_template('registro.html')
+            else:
+                flash("Las contraseñas no coinciden ")
+                return render_template('registro.html')
+        except:
+            flash("Error en el registro")
+            return render_template('registro.html')
 
 
 @app.route("/subirImagen", methods=['GET'])
