@@ -1,9 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, flash, request, redirect, url_for
+
 app = Flask(__name__)
 
-@app.route("/", methods=['GET'])
+@app.route("/", methods=['POST','GET'])
 def index():
     return render_template('principal.html')
+
 
 @app.route("/header.html", methods=['GET'])
 def header():
@@ -13,8 +15,32 @@ def header():
 def footer():
     return render_template('footer.html')
 
-@app.route("/login", methods=['GET'])
+@app.route("/login", methods=['POST','GET'])
 def login():
+    try:
+        error = None
+        print(request.method)
+        if request.method == 'POST':
+            username = request.form['usuario']
+            password = request.form['password']
+        else:
+            username = request.args.get['usuario']
+            password = request.args.get['password']
+
+        if(username == "Prueba" and password == "Prueba123"):
+            return redirect('/')
+        else:
+            if(username == None and password == None): 
+                error = "Escriba usuario y contraseña"
+                flash(error)
+                return render_template('login.html')
+            else:
+                error = "Usuario o contraseña incorrecto"
+                flash(error)
+                return render_template('login.html')     
+    except:
+        return render_template('login.html')
+    print(hola())
     return render_template('login.html')
 
 @app.route("/recuperarContraseña", methods=['GET'])
@@ -30,6 +56,6 @@ def registro():
 def subirImg():
     return render_template('subirImg.html')
 
-@app.route("/vistaImg.html", methods=['GET'])
-def vistaImg():
-    return render_template('vistaImg.html')
+@app.route("/verImagen", methods=['GET'])
+def vistaImg(titulo='Esto es un titulo de prueba', descripcion = 'Vacaciones en la playa con mi familia y amigos, celebramos año nuevo con muchos fuegos artificiales. Una de las mejores experiencias en mi vida.'):
+    return render_template('vistaImg.html', titulo=titulo, descripcion=descripcion)
