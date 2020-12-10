@@ -63,7 +63,7 @@ def registro():
                     flash("La contraseña no cumple con los requisitos exigidos")
                     return render_template('registro.html')
             else:
-                flash("Las contraseñas no coinciden ")
+                flash("Las contraseñas no coinciden")
                 return render_template('registro.html')
         except:
             flash("Error en el registro")
