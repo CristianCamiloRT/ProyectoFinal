@@ -40,7 +40,6 @@ def login():
                 return render_template('login.html')     
     except:
         return render_template('login.html')
-    print(hola())
     return render_template('login.html')
 
 @app.route("/recuperarContraseña", methods=['GET'])
