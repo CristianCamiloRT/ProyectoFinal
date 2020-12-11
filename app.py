@@ -1,8 +1,8 @@
 from flask import Flask, render_template, flash, request, redirect, url_for
+import re
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-
 
 @app.route("/", methods=['POST','GET'])
 def index():
@@ -39,15 +39,43 @@ def login():
     except Exception as e:
         print(e)
         return render_template('login.html')
+    print(hola())
     return render_template('login.html')
 
 @app.route("/recuperarContraseña", methods=['GET'])
 def recuperarContra():
     return render_template('recuperarContra.html')
 
-@app.route("/registro", methods=['GET'])
+@app.route("/registro", methods=['POST','GET'])
 def registro():
-    return render_template('registro.html')
+    if (request.method == 'GET'):
+        return render_template('registro.html')
+    elif (request.method == 'POST'):
+        try:
+            passwd = str(request.form.get('passWd'))
+            passco = str(request.form.get('passConf'))
+            emailv = str(request.form.get('emailv'))
+
+            if(passwd == passco):
+                m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', passwd)
+                if(m != None ):
+                    r = re.search('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', emailv)
+                    if( r != None):
+                        flash("registro correcto!")
+                        return render_template('principal.html')
+                    else:
+                        flash("El correo no es correcto")
+                        return render_template('registro.html')
+                else:
+                    flash("La contraseña no cumple con los requisitos exigidos")
+                    return render_template('registro.html')
+            else:
+                flash("Las contraseñas no coinciden ")
+                return render_template('registro.html')
+        except:
+            flash("Error en el registro")
+            return render_template('registro.html')
+
 
 
 @app.route("/subirImagen", methods=['GET'])

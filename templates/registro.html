@@ -27,10 +27,19 @@
 			<div class="container">
 				<div class="card border-dark mb-3" style="max-width: 80rem;">
 					<div class="card-header">Formulario De Registro</div>
+					{% with messages = get_flashed_messages() %}
+  						{% if messages %}
+    						<ul style="color:red;">
+    						{% for message in messages %}
+      							<li>{{ message }} </li>
+    						{% endfor %}
+    						</ul>
+  						{% endif %}
+					{% endwith %}
 					<div class="card-body text-dark">
 						<h5 class="card-title">Diligencia toda la información <small>(Los campos con <label
 									style="color:#FF0000" ;>*</label> son obligatorios)</small></h5><br>
-						<form>
+						<form method='post' action="#">
 							<div class="form-row">
 								<div class="col-md-12 mb-3">
 									<label for="exampleFormControlInput1">Nombre de usuario <label style="color:#FF0000"
@@ -44,14 +53,12 @@
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Contraseña <label style="color:#FF0000"
 											;>*</label></label>
-									<input type="password" class="form-control" id="input2" placeholder="Contraseña"
-										required>
+									<input type="password" class="form-control" id="input2" placeholder="Contraseña" name="passWd" required='required'>
 								</div>
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Repetir contraseña <label
 											style="color:#FF0000" ;>*</label></label>
-									<input type="password" class="form-control" id="input3"
-										placeholder="Repetir contraseña" required>
+									<input type="password" class="form-control" id="input3" placeholder="Repetir contraseña" name="passConf" required='required'>
 								</div>
 							</div>
 
@@ -70,8 +77,7 @@
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Correo electonico <label style="color:#FF0000"
 											;>*</label></label>
-									<input type="email" class="form-control" id="input6"
-										placeholder="ejemplo@midominio.com" required>
+									<input type="email" class="form-control" id="input6" name="emailv" placeholder="ejemplo@midominio.com" required>
 								</div>
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Telefono<label style="color:#FF0000"
