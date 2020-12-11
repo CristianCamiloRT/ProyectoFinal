@@ -1,9 +1,12 @@
 from flask import Flask, render_template, flash, request, redirect, url_for
 import re
 import yagmail
+import random
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+yag = yagmail.SMTP('minticprueba1234@gmail.com', 'prueba1234')
 
 @app.route("/", methods=['POST','GET'])
 def index():
@@ -49,39 +52,49 @@ def recuperarContra():
     elif (request.method == 'POST'):
         try:
             correo = None
+            token = None
+            TokenForm = None
             correo = request.form['emailRecuperar']
 
-            if(correo != None):
-
+            if(correo != None and TokenForm == None):
                 r = re.search('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', correo)
                 if( r != None):
-                    flash("Token enviado")
+                    token = str(random.randint(100000, 1000000))
+                    contents = [
+                        "Acabas de recibir un correo prueba",
+                        "El siguiente es tu token: ", token
+                    ]
+                    yag.send(correo, 'Recuperar contraseña', contents)
+                    flash("Token enviado (Puede llegar a tu carpeta de spam)")
                     return render_template('recuperarContra.html')
                 else:
                     flash("Correo no valido")
                     return render_template('recuperarContra.html')
             else:
-                flash("Correo vacio")
-                return render_template('recuperarContra.html')
+                pass1 = request.form['contra']
+                pass2 = request.form['contrac']
+                TokenForm = request.form['token']
+
+                if(pass1 == pass2):
+                    m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', pass1)
+                    if(m != None ):
+                        if(token == TokenForm):
+                            flash("Cambio realizado!")
+                            return render_template('principal.html')
+                        else:
+                            flash("El token no corresponde al enviado")
+                            return render_template('recuperarContra.html')
+                    else:
+                        flash("La contraseña no cumple con los requisitos exigidos")
+                        return render_template('recuperarContra.html')
+                else:
+                    flash("Las contraseñas no coinciden ")
+                    return render_template('recuperarContra.html')
         except Exception as e:
             print(e)
             flash("Error en el envio de token")
             return render_template('recuperarContra.html')
-
-
-
-
-
-
-
-    
-    # yagmail.SMTP('minticprueba1234@gmail.com', 'Prueba1234')
-
-    # contents = [
-    #     "This is the body, and here is just text http://somedomain/image.png",
-    #     "You can find an audio file attached.", '/local/path/to/song.mp3'
-    # ]
-    # yag.send('to@someone.com', 'subject', contents)
+ 
 
 
 
