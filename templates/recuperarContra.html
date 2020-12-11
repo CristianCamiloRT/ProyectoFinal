@@ -22,23 +22,46 @@
         includeHTML();
     </script>
     <main role="main">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-warning" role="alert">
+                        <span>{{ message }}</span>
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <div class="album py-5 bg-light">
             <div class="container">
                 <div class="card border-dark mb-3" style="max-width: 80rem;">
                     <div class="card-header">Recuperar Contraseña</div>
                         <div class="card-body text-dark">
                             <h5 class="card-title">Diligencia toda la información</h5><br><br>
-                            <form>
+                            <form action="{{url_for('recuperarContra')}}" method="POST">
+                                <div class="form-group">
+                                    <label for="inputAddress">Correo<label style="color:#FF0000"
+                                      ;>*</label></label>                     
+                                    <input type="email" class="form-control" id="emailRecuperar" name="emailRecuperar" placeholder="Correo Electronico" required>
+                                  </div>
+                                  <div class="d-flex justify-content-center align-items-center d-flex align-content-start flex-wrap">
+                                    <button type="submit" class="btn btn-primary mb-1">Enviar Token</button>
+                                </div>
+                            </form>
+                            <br>
+                            <form action="{{url_for('recuperarContra')}}" method="POST">
                                 <div class="form-row">
                                   <div class="form-group col-md-6">
                                     <label for="inputEmail4">Nueva Contraseña<label style="color:#FF0000"
                                         ;>*</label></label>
-                                    <input type="password" class="form-control" id="inputEmail4" placeholder="Nueva Contraseña" required> 
+                                    <input type="password" class="form-control" id="contra" name="contra" placeholder="Nueva Contraseña" required> 
                                   </div>
                                   <div class="form-group col-md-6">
                                     <label for="inputPassword4">Confirmar Nueva Contraseña<label style="color:#FF0000"
                                         ;>*</label></label>
-                                    <input type="password" class="form-control" id="inputPassword4" placeholder="Confirmar Nueva Contraseña" required>
+                                    <input type="password" class="form-control" id="contrac" name="contrac" placeholder="Confirmar Nueva Contraseña" required>
                                   </div>
                                 </div>
                                 <div class="form-group">
@@ -78,13 +101,11 @@
                                        </script>
                                        
    
-                   </div>
-                   
-                                  <input type="text" class="form-control" id="inputAddress" placeholder="Token" required>
+                                    </div>
+                                  <input type="text" class="form-control" id="token" name="token" placeholder="Token" required>
                                 </div>
                                 <div class="d-flex justify-content-center align-items-center d-flex align-content-start flex-wrap">
-                                    <button type="submit" class="btn btn-primary mr-2 mb-1">Cambiar Contraseña</button>
-                                    <button type="submit" class="btn btn-primary mb-1">Enviar Token Nuevamente</button>
+                                    <button type="submit" class="btn btn-primary mb-1">Cambiar Contraseña</button>
                                 </div>
                             </form>
                         </div>
