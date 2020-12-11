@@ -25,6 +25,18 @@
       <input type="text" id="usuario" name="usuario" class="form-control" placeholder="Nombre de usuario" required autofocus>
       <label for="password" class="sr-only">Password</label>
       <input type="password" id="password" name="password" class="form-control" placeholder="Correo" required>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-warning" role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+      {% endwith %}
       <div class="checkbox mb-3">
         <label>
           <input type="checkbox" value="Recordarme"> Recordarme
@@ -35,11 +47,7 @@
       <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
     </form>
 
-    <section class="content">
-      {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
-      {% endfor %}
-    </section>
+    
   </body>
 
 

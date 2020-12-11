@@ -1,6 +1,8 @@
 from flask import Flask, render_template, flash, request, redirect, url_for
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
 
 @app.route("/", methods=['POST','GET'])
 def index():
@@ -30,15 +32,12 @@ def login():
         if(username == "Prueba" and password == "Prueba123"):
             return redirect('/')
         else:
-            if(username == None and password == None): 
-                error = "Escriba usuario y contraseña"
-                flash(error)
-                return render_template('login.html')
-            else:
-                error = "Usuario o contraseña incorrecto"
-                flash(error)
-                return render_template('login.html')     
-    except:
+            error = "Usuario o contraseña incorrecto"
+            print(error)
+            flash(error)  
+            return render_template('login.html')        
+    except Exception as e:
+        print(e)
         return render_template('login.html')
     return render_template('login.html')
 
