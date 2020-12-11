@@ -54,6 +54,8 @@ def registro():
         try:
             passwd = request.form.get('passWd')
             passco = request.form.get('passConf')
+            emailv = str(request.form.get('emailv'))
+
             if(passwd == passco):
                 m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', passwd)
                 if(m != None ):
