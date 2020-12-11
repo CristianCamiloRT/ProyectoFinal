@@ -57,8 +57,13 @@ def registro():
             if(passwd == passco):
                 m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', passwd)
                 if(m != None ):
-                    flash("registro correcto!")
-                    return render_template('principal.html')
+                    r = re.search('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', emailv)
+                    if( r != None):
+                        flash("registro correcto!")
+                        return render_template('principal.html')
+                    else:
+                        flash("El correo no es correcto")
+                        return render_template('registro.html')
                 else:
                     flash("La contraseña no cumple con los requisitos exigidos")
                     return render_template('registro.html')
