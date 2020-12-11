@@ -1,5 +1,6 @@
 from flask import Flask, render_template, flash, request, redirect, url_for
 import re
+import yagmail
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -39,12 +40,51 @@ def login():
     except Exception as e:
         print(e)
         return render_template('login.html')
-    print(hola())
     return render_template('login.html')
 
-@app.route("/recuperarContraseña", methods=['GET'])
+@app.route("/recuperarContra", methods=['POST','GET'])
 def recuperarContra():
-    return render_template('recuperarContra.html')
+    if (request.method == 'GET'):
+        return render_template('recuperarContra.html')
+    elif (request.method == 'POST'):
+        try:
+            correo = None
+            correo = request.form['emailRecuperar']
+
+            if(correo != None):
+
+                r = re.search('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', correo)
+                if( r != None):
+                    flash("Token enviado")
+                    return render_template('recuperarContra.html')
+                else:
+                    flash("Correo no valido")
+                    return render_template('recuperarContra.html')
+            else:
+                flash("Correo vacio")
+                return render_template('recuperarContra.html')
+        except Exception as e:
+            print(e)
+            flash("Error en el envio de token")
+            return render_template('recuperarContra.html')
+
+
+
+
+
+
+
+    
+    # yagmail.SMTP('minticprueba1234@gmail.com', 'Prueba1234')
+
+    # contents = [
+    #     "This is the body, and here is just text http://somedomain/image.png",
+    #     "You can find an audio file attached.", '/local/path/to/song.mp3'
+    # ]
+    # yag.send('to@someone.com', 'subject', contents)
+
+
+
 
 @app.route("/registro", methods=['POST','GET'])
 def registro():
