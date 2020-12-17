@@ -110,9 +110,7 @@ def insertar_imagen_facil(link, titulo1, otros): #inserta iamgen params(el_objet
 			if (key == 'estado' and (value != None)):
 				img.estado = value
 			if (key == 'ruta' and (value != None)):
-				img.celular = value
-			if (key == 'ruta' and (value != None)):
-				img.profesion = value
+				img.ruta = value
 			if (key == 'user_id' and (value != None)):
 				img.user_id = value
 		link.session.add(img)   
@@ -145,9 +143,7 @@ def modificar_imagen(link, id1, otros):
 			if (key == 'estado' and (value != None)):
 				img.estado = value
 			if (key == 'ruta' and (value != None)):
-				img.celular = value
-			if (key == 'ruta' and (value != None)):
-				img.profesion = value
+				img.ruta = value
 			if (key == 'user_id' and (value != None)):
 				img.user_id = value
 		link.session.commit()
