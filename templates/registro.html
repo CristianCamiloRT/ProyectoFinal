@@ -23,28 +23,31 @@
 	</script>
 
 	<main role="main">
+		{% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        <span>{{ message }}</span>
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <!-- <span aria-hidden="true">&times;</span> -->
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 		<div class="album py-5 bg-light">
 			<div class="container">
 				<div class="card border-dark mb-3" style="max-width: 80rem;">
 					<div class="card-header">Formulario De Registro</div>
-					{% with messages = get_flashed_messages() %}
-  						{% if messages %}
-    						<ul style="color:red;">
-    						{% for message in messages %}
-      							<li>{{ message }} </li>
-    						{% endfor %}
-    						</ul>
-  						{% endif %}
-					{% endwith %}
 					<div class="card-body text-dark">
 						<h5 class="card-title">Diligencia toda la información <small>(Los campos con <label
 									style="color:#FF0000" ;>*</label> son obligatorios)</small></h5><br>
-						<form method='post' action="#">
+						<form action="{{url_for('registro')}}" method="POST">
 							<div class="form-row">
 								<div class="col-md-12 mb-3">
 									<label for="exampleFormControlInput1">Nombre de usuario <label style="color:#FF0000"
 											;>*</label></label>
-									<input type="text" class="form-control" id="input1" placeholder="Nombre de usuario"
+									<input type="text" class="form-control" id="input1" name="username" placeholder="Nombre de usuario"
 										required>
 								</div>
 							</div>
@@ -65,11 +68,11 @@
 							<div class="form-row">
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Nombre</label>
-									<input type="text" class="form-control" id="input4" placeholder="Nombre">
+									<input type="text" class="form-control" id="input4" name="nombre" placeholder="Nombre">
 								</div>
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Apellido</label>
-									<input type="text" class="form-control" id="input5" placeholder="Apellido">
+									<input type="text" class="form-control" id="input5" name="apellido" placeholder="Apellido">
 								</div>
 							</div>
 
@@ -82,18 +85,18 @@
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Telefono<label style="color:#FF0000"
 											;>*</label></label>
-									<input type="text" class="form-control" id="input7" placeholder="Telefono" required>
+									<input type="text" class="form-control" id="input7" placeholder="Telefono" name="telefono" required>
 								</div>
 							</div>
 
 							<div class="form-row">
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Profesión</label>
-									<input type="text" class="form-control" id="input8" placeholder="Profesión">
+									<input type="text" class="form-control" id="input8" name="profesion" placeholder="Profesión">
 								</div>
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Fecha de nacimiento</label>
-									<input type="date" class="form-control" id="input9">
+									<input type="date" class="form-control" name="fecha"  id="input9">
 								</div>
 							</div><br>
 							<button type="submit" class="btn btn-primary">Registrarse</button>

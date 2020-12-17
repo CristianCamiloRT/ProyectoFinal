@@ -1,3 +1,5 @@
+import os
+import io
 from flask import Flask, render_template, flash, request, redirect, url_for #para que flask funciones
 import re #expresiones regulares
 import yagmail #correos electronicos
@@ -7,6 +9,7 @@ from funciones import * #importa el archivo funciones.py donde puse toda las fun
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.config['UPLOAD_FOLDER'] = 'static/images/imgUsuarios'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///artemisia.db' #esta linea pone la base de datos en el mismo directorio que app.py, y la crea como una base de datos SQLite v3
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app) #devuelve un objeto con los manejadores de la base de datos (crea la conexion con la db configurada arriba)
@@ -20,15 +23,16 @@ class User(db.Model):
 	contrasena = db.Column(db.String(200), nullable=False)
 	nombre = db.Column(db.String(200), nullable=False)
 	apellido = db.Column(db.String(200), nullable=False)
-	email = db.Column(db.String(100), nullable=False)
+	email = db.Column(db.String(100), unique=True, nullable=False)
 	celular = db.Column(db.String(20), nullable=False)
 	profesion = db.Column(db.String(100), nullable=True)
-	fecha_nacimiento = db.Column(db.DateTime, nullable=True)
+	fecha_nacimiento = db.Column(db.String(20), nullable=True)
 	user_active = db.Column(db.Boolean, nullable=False)
 	user_admin = db.Column(db.Boolean, nullable=False)
 	images = db.relationship('Image', backref='user', lazy=True)
 	def __repr__(self):
 		return '<User %r>' % self.username
+
 
 class Image(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -37,12 +41,17 @@ class Image(db.Model):
 	descripcion = db.Column(db.String(200), nullable=False)
 	estado = db.Column(db.Boolean, nullable=False)
 	ruta = db.Column(db.String(250), nullable=False)
+	binary = db.Column(db.Binary, nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	
 	def __repr__(self):
 		return '<Image %r>' % self.titulo
 		
 #rutas y sus funciones
+
+
+db.create_all()
+
 
 @app.route("/", methods=['POST','GET'])
 def index():
@@ -69,7 +78,7 @@ def login():
             username = request.args.get['usuario']
             password = request.args.get['password']
 
-        if(username == "Prueba" and password == "Prueba123"):
+        if(validar_login(username, password)):
             return redirect('/')
         else:
             error = "Usuario o contraseña incorrecto"
@@ -130,10 +139,6 @@ def recuperarContra():
             print(e)
             flash("Error en el envio de token")
             return render_template('recuperarContra.html')
- 
-
-
-
 
 @app.route("/registro", methods=['POST','GET'])
 def registro():
@@ -141,15 +146,22 @@ def registro():
         return render_template('registro.html')
     elif (request.method == 'POST'):
         try:
-            passwd = str(request.form.get('passWd'))
-            passco = str(request.form.get('passConf'))
-            emailv = str(request.form.get('emailv'))
+            passwd = str(request.form['passWd'])
+            passco = str(request.form['passConf'])
+            emailv = str(request.form['emailv'])
+            username = str(request.form['username'])
+            nombre = str(request.form['nombre'])
+            apellido = str(request.form['apellido'])
+            telefono = str(request.form['telefono'])
+            profesion = str(request.form['profesion'])
+            fecha = str(request.form['fecha'])
 
             if(passwd == passco):
                 m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', passwd)
                 if(m != None ):
                     r = re.search('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', emailv)
                     if( r != None):
+                        insertar_usuario_facil(db, username, {'contrasena':passwd, 'apellido':apellido, 'nombre':nombre, 'email':emailv, 'celular':telefono, 'profesion':profesion, 'fecha_nacimiento':fecha, 'user_active':True, 'user_admin':True})
                         flash("registro correcto!")
                         return render_template('principal.html')
                     else:
@@ -161,16 +173,44 @@ def registro():
             else:
                 flash("Las contraseñas no coinciden ")
                 return render_template('registro.html')
-        except:
-            flash("Error en el registro")
+        except Exception as e:
+            print(e)
+            se = str(e)
+            if(se.startswith("(sqlite3.IntegrityError) UNIQUE constraint failed: user.username")): 
+                flash("Error en el registro (Ya existe el nombre de usuario)")
+            if(se.startswith("(sqlite3.IntegrityError) UNIQUE constraint failed: user.email")):
+                flash("Error en el registro (Correo ya registrado)")
             return render_template('registro.html')
 
 
-
-@app.route("/subirImagen", methods=['GET'])
+@app.route("/subirImagen", methods=['POST','GET'])
 def subirImg():
-    return render_template('subirImg.html')
+    if (request.method == 'GET'):
+        return render_template('subirImg.html')
+    elif (request.method == 'POST'):
+        try:
+            titulo = str(request.form['titulo'])
+            tags = str(request.form['tags'])
+            descripcion = str(request.form['descripcion'])
+            option = bool(request.form['estado'])
+
+            # obtenemos el archivo del input "archivo"
+            f = request.files['archivo']
+            filename = f.filename
+            bytesVar = f.read()
+            # Guardamos el archivo en el directorio "Archivos PDF"
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            ruta = app.config['UPLOAD_FOLDER']+'/'+filename
+            # Retornamos una respuesta satisfactoria
+            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':'1', 'binary':bytesVar})
+            flash("GUARDADA")
+            return render_template('subirImg.html')
+        except Exception as e:
+            print(e)
+            flash(str(e))
+            return render_template('subirImg.html')
 
 @app.route("/verImagen", methods=['GET'])
 def vistaImg(titulo='Esto es un titulo de prueba', descripcion = 'Vacaciones en la playa con mi familia y amigos, celebramos año nuevo con muchos fuegos artificiales. Una de las mejores experiencias en mi vida.'):
     return render_template('vistaImg.html', titulo=titulo, descripcion=descripcion)
+
