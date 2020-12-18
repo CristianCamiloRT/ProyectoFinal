@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy #base de datos (es la libreria SQLalchemy de python totalmente compatible con flask)
+from sqlalchemy import and_ 
 from werkzeug.security import generate_password_hash, check_password_hash #hashes criptograficamente seguros
 from flask import session
- 
+
 def insertar_usuario(link, us, co, no, ap, em, ce, pr, fe, uact, uadm): #inserta un usuario params(el_objeto_db, username, nombre, ..., user_admin)
 	try:
 		from app import User
@@ -169,3 +170,48 @@ def validar_login(username1, passwd):
 	except:
 		return False
 	return False
+
+def obtenerImagenes():
+	try: 
+		from app import Image
+		imagenes = Image.query.filter_by(estado=1).all()
+		# imagenes = Image.query.count()
+		if imagenes != None:
+				return imagenes
+	except Exception as e:
+		return str(e)
+	return False
+
+def obtenerMisImagenes():
+	try: 
+		from app import Image
+		imagenes = Image.query.filter_by(user_id=session["id"]).all()
+		# imagenes = Image.query.count()
+		if imagenes != None:
+				return imagenes
+	except Exception as e:
+		return str(e)
+	return False
+
+def obtenerPorId(idGet):
+	try: 
+		from app import Image
+		imagenes = Image.query.filter_by(id=idGet).all()
+		# imagenes = Image.query.count()
+		if imagenes != None:
+				return imagenes
+	except Exception as e:
+		return str(e)
+	return False
+
+def buscarImagenes(tag):
+	try: 
+		from app import Image
+		search = "%{}%".format(tag)
+		imagenes = Image.query.filter(and_(Image.tags.like(search),Image.estado==1)).all()
+		if imagenes != None:
+			return imagenes
+	except Exception as e:
+		return str(e)
+	return False
+	

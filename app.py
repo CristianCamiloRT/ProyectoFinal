@@ -55,7 +55,24 @@ db.create_all()
 
 @app.route("/", methods=['POST','GET'])
 def index():
-    return render_template('principal.html')
+    lista_imagenes = obtenerImagenes()
+    return render_template('principal.html', lista_imagenes=lista_imagenes)
+
+@app.route("/misImagenes", methods=['POST','GET'])
+def misImagenes():
+    mis_imagenes = obtenerMisImagenes()
+    return render_template('misImagenes.html', mis_imagenes=mis_imagenes)
+
+@app.route("/buscarImagen", methods=['POST','GET'])
+def buscarImagen():
+    tag = str(request.form['tag'])
+    print(tag)
+    
+    lista_imagenes = buscarImagenes(tag)
+    print(lista_imagenes)
+    for element in lista_imagenes:
+        print(element)
+    return render_template('principal.html', lista_imagenes=lista_imagenes)
 
 @app.route("/cerrarSesion", methods=['POST','GET'])
 def cerrarSesion():
@@ -64,7 +81,6 @@ def cerrarSesion():
     session.pop("admin",None)
     session.pop("correo",None)
     return redirect('/')
-
 
 @app.route("/header.html", methods=['GET'])
 def header():
@@ -212,11 +228,11 @@ def subirImg():
 
             # obtenemos el archivo del input "archivo"
             f = request.files['archivo']
-            filename = secure_filename(f.filename)
+            filename = f.filename
             filename = str(random.randint(100000, 1000000))+'-image-'+str(date.today())+'-'+filename
-            bytesVar = f.read()
             # Guardamos el archivo en el directorio "Archivos PDF"
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            bytesVar = f.read()
             ruta = app.config['UPLOAD_FOLDER']+'/'+filename
             # Retornamos una respuesta satisfactoria
             insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':session["id"], 'binary':bytesVar})
@@ -228,6 +244,8 @@ def subirImg():
             return render_template('subirImg.html')
 
 @app.route("/verImagen", methods=['GET'])
-def vistaImg(titulo='Esto es un titulo de prueba', descripcion = 'Vacaciones en la playa con mi familia y amigos, celebramos año nuevo con muchos fuegos artificiales. Una de las mejores experiencias en mi vida.'):
-    return render_template('vistaImg.html', titulo=titulo, descripcion=descripcion)
+def vistaImg():
+    id = request.args.get('id')
+    lista_imagen = obtenerPorId(id)
+    return render_template('vistaImg.html', lista_imagen=lista_imagen)
 
