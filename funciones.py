@@ -115,8 +115,6 @@ def insertar_imagen_facil(link, titulo1, otros): #inserta iamgen params(el_objet
 				img.ruta = value
 			if (key == 'user_id' and (value != None)):
 				img.user_id = value
-			if (key == 'binary' and (value != None)):
-				img.binary = value
 		link.session.add(img)   
 		link.session.commit()
 	except AssertionError as error:

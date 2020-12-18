@@ -42,37 +42,27 @@ class Image(db.Model):
 	descripcion = db.Column(db.String(200), nullable=False)
 	estado = db.Column(db.Boolean, nullable=False)
 	ruta = db.Column(db.String(250), nullable=False)
-	binary = db.Column(db.Binary, nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	
 	def __repr__(self):
 		return '<Image %r>' % self.titulo
-		
-#rutas y sus funciones
-
 
 db.create_all()
 
 @app.route("/", methods=['POST','GET'])
 def index():
-    lista_imagenes = obtenerImagenes()
-    return render_template('principal.html', lista_imagenes=lista_imagenes)
+    if (request.method == 'GET'):
+        lista_imagenes = obtenerImagenes()
+        return render_template('principal.html', lista_imagenes=lista_imagenes)
+    elif (request.method == 'POST'):
+        tag = str(request.form['tag'])
+        lista_imagenes = buscarImagenes(tag)
+        return render_template('principal.html', lista_imagenes=lista_imagenes)
 
 @app.route("/misImagenes", methods=['POST','GET'])
 def misImagenes():
     mis_imagenes = obtenerMisImagenes()
     return render_template('misImagenes.html', mis_imagenes=mis_imagenes)
-
-@app.route("/buscarImagen", methods=['POST','GET'])
-def buscarImagen():
-    tag = str(request.form['tag'])
-    print(tag)
-    
-    lista_imagenes = buscarImagenes(tag)
-    print(lista_imagenes)
-    for element in lista_imagenes:
-        print(element)
-    return render_template('principal.html', lista_imagenes=lista_imagenes)
 
 @app.route("/cerrarSesion", methods=['POST','GET'])
 def cerrarSesion():
@@ -222,8 +212,10 @@ def subirImg():
     elif (request.method == 'POST'):
         try:
             titulo = str(request.form['titulo'])
+            titulo = titulo.upper()
             tags = str(request.form['tags'])
             descripcion = str(request.form['descripcion'])
+            descripcion = descripcion.capitalize()
             option = bool(request.form['estado'])
 
             # obtenemos el archivo del input "archivo"
@@ -232,10 +224,10 @@ def subirImg():
             filename = str(random.randint(100000, 1000000))+'-image-'+str(date.today())+'-'+filename
             # Guardamos el archivo en el directorio "Archivos PDF"
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            bytesVar = f.read()
+            # bytesVar = f.read()
             ruta = app.config['UPLOAD_FOLDER']+'/'+filename
             # Retornamos una respuesta satisfactoria
-            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':session["id"], 'binary':bytesVar})
+            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':session["id"]})
             flash("GUARDADA")
             return render_template('subirImg.html')
         except Exception as e:
