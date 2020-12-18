@@ -3,7 +3,7 @@ Routes and views for the flask application.
 """
 from flask import render_template, flash, request, redirect, url_for
 import os, re, yagmail, random
-import Artemisia.funciones
+import Artemisia.database
 import Artemisia.Class
 
 from Artemisia import app,db

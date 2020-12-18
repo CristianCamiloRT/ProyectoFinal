@@ -4,15 +4,16 @@ class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(100), unique=True, nullable=False)
 	contrasena = db.Column(db.String(200), nullable=False)
-	nombre = db.Column(db.String(200), nullable=False)
-	apellido = db.Column(db.String(200), nullable=False)
+	nombre = db.Column(db.String(200), nullable=True)
+	apellido = db.Column(db.String(200), nullable=True)
 	email = db.Column(db.String(100), unique=True, nullable=False)
 	celular = db.Column(db.String(20), nullable=False)
 	profesion = db.Column(db.String(100), nullable=True)
 	fecha_nacimiento = db.Column(db.String(20), nullable=True)
-	user_active = db.Column(db.Boolean, nullable=False)
-	user_admin = db.Column(db.Boolean, nullable=False)
+	user_active = db.Column(db.Boolean, nullable=False, default=True)
+	user_admin = db.Column(db.Boolean, nullable=False, default=False)
 	images = db.relationship('Image', backref='user', lazy=True)
+
 	def __repr__(self):
 		return '<User %r>' % self.username
 

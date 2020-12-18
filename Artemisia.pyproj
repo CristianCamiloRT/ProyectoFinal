@@ -28,7 +28,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Artemisia\funciones.py" />
+    <Compile Include="Artemisia\database.py" />
     <Compile Include="Artemisia\Class.py">
       <SubType>Code</SubType>
     </Compile>

@@ -14,5 +14,5 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app) #devuelve un objeto con los manejadores de la base de datos (crea la conexion con la db configurada arriba)
 
 import Artemisia.views
-import Artemisia.funciones
+import Artemisia.database
 import Artemisia.Class
