@@ -1,11 +1,12 @@
 import os
-import io
 from flask import Flask, render_template, flash, request, redirect, url_for #para que flask funciones
+from werkzeug.utils import secure_filename
 import re #expresiones regulares
 import yagmail #correos electronicos
 import random #generador seudoaleatorio
 from flask_sqlalchemy import SQLAlchemy #base de datos (es la libreria SQLalchemy de python totalmente compatible con flask)
 from funciones import * #importa el archivo funciones.py donde puse toda las funciones que no estan aqui :)
+from datetime import date
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -196,7 +197,8 @@ def subirImg():
 
             # obtenemos el archivo del input "archivo"
             f = request.files['archivo']
-            filename = f.filename
+            filename = secure_filename(f.filename)
+            filename = str(random.randint(100000, 1000000))+'-image-'+str(date.today())+'-'+filename
             bytesVar = f.read()
             # Guardamos el archivo en el directorio "Archivos PDF"
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
