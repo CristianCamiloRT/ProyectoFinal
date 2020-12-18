@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy #base de datos (es la libreria SQLalchemy de python totalmente compatible con flask)
 from werkzeug.security import generate_password_hash, check_password_hash #hashes criptograficamente seguros
-
+from flask import session
+ 
 def insertar_usuario(link, us, co, no, ap, em, ce, pr, fe, uact, uadm): #inserta un usuario params(el_objeto_db, username, nombre, ..., user_admin)
 	try:
 		from app import User
@@ -160,6 +161,10 @@ def validar_login(username1, passwd):
 		usuario = User.query.filter_by(username=username1).first()
 		if usuario != None:
 			if check_password_hash(usuario.contrasena, passwd):
+				session["id"]=usuario.id
+				session["username"]=usuario.username
+				session["admin"]=usuario.user_admin
+				session["correo"]=usuario.email	
 				return True
 	except:
 		return False

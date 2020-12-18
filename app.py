@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, flash, request, redirect, url_for #para que flask funciones
+from flask import Flask, render_template, flash, request, redirect, url_for, session #para que flask funciones
 from werkzeug.utils import secure_filename
 import re #expresiones regulares
 import yagmail #correos electronicos
@@ -53,10 +53,17 @@ class Image(db.Model):
 
 db.create_all()
 
-
 @app.route("/", methods=['POST','GET'])
 def index():
     return render_template('principal.html')
+
+@app.route("/cerrarSesion", methods=['POST','GET'])
+def cerrarSesion():
+    session.pop("id",None)
+    session.pop("username",None)
+    session.pop("admin",None)
+    session.pop("correo",None)
+    return redirect('/')
 
 
 @app.route("/header.html", methods=['GET'])
@@ -71,6 +78,10 @@ def footer():
 def login():
     try:
         error = None
+        session.pop("id",None)
+        session.pop("username",None)
+        session.pop("admin",None)
+        session.pop("correo",None)
         print(request.method)
         if request.method == 'POST':
             username = request.form['usuario']
@@ -80,6 +91,10 @@ def login():
             password = request.args.get['password']
 
         if(validar_login(username, password)):
+            print(session["id"])
+            print(session["username"])
+            print(session["admin"])
+            print(session["correo"])
             return redirect('/')
         else:
             error = "Usuario o contraseña incorrecto"
@@ -204,7 +219,7 @@ def subirImg():
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             ruta = app.config['UPLOAD_FOLDER']+'/'+filename
             # Retornamos una respuesta satisfactoria
-            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':'1', 'binary':bytesVar})
+            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':session["id"], 'binary':bytesVar})
             flash("GUARDADA")
             return render_template('subirImg.html')
         except Exception as e:
