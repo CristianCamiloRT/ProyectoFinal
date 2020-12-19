@@ -5,7 +5,7 @@ from flask import render_template, flash, request, redirect, url_for
 import os, re, yagmail, random
 import Artemisia.database
 import Artemisia.Class
-
+from Artemisia.database import *
 from Artemisia import app,db
 
 db.create_all()
@@ -13,7 +13,7 @@ db.create_all()
 @app.route("/", methods=['POST','GET'])
 def index():
     if (request.method == 'GET'):
-        lista_imagenes = obtenerImagenes()
+        lista_imagenes = fakeobj() #obtenerImagenes()
         return render_template('principal.html', lista_imagenes=lista_imagenes)
     elif (request.method == 'POST'):
         tag = str(request.form['tag'])
@@ -138,24 +138,15 @@ def registro():
             telefono = str(request.form['telefono'])
             profesion = str(request.form['profesion'])
             fecha = str(request.form['fecha'])
-
-            if(passwd == passco):
-                m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', passwd)
-                if(m != None ):
-                    r = re.search('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', emailv)
-                    if( r != None):
-                        insertar_usuario_facil(db, username, {'contrasena':passwd, 'apellido':apellido, 'nombre':nombre, 'email':emailv, 'celular':telefono, 'profesion':profesion, 'fecha_nacimiento':fecha, 'user_active':True, 'user_admin':True})
-                        flash("registro correcto!")
-                        return render_template('principal.html')
-                    else:
-                        flash("El correo no es correcto")
-                        return render_template('registro.html')
-                else:
-                    flash("La contraseña no cumple con los requisitos exigidos")
-                    return render_template('registro.html')
+            if(passwd==passco):
+                if add_user(username,passwd,emailv,telefono,**{'apellido':apellido, 'nombre':nombre, 'profesion':profesion, 'fecha_nacimiento':fecha, 'user_active':True, 'user_admin':False}):
+                    flash("registro correcto!")
+                    return render_template('principal.html')
+                return render_template('registro.html')
             else:
                 flash("Las contraseñas no coinciden ")
                 return render_template('registro.html')
+
         except Exception as e:
             print(e)
             se = str(e)

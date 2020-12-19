@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -29,8 +29,6 @@
                     <div class="alert alert-danger" role="alert">
                         <span>{{ message }}</span>
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <!-- <span aria-hidden="true">&times;</span> -->
-                        </button>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -45,18 +43,42 @@
 						<form action="{{url_for('registro')}}" method="POST">
 							<div class="form-row">
 								<div class="col-md-12 mb-3">
-									<label for="exampleFormControlInput1">Nombre de usuario <label style="color:#FF0000"
-											;>*</label></label>
+									<label for="exampleFormControlInput1">
+										Nombre de usuario <label style="color:#FF0000"
+								   ;>*</label>
+									</label>
 									<input type="text" class="form-control" id="input1" name="username" placeholder="Nombre de usuario"
-										required>
+										   required>
+									{% with messages = get_flashed_messages(category_filter=["err-usr"]) %}
+										{% if messages %}
+											{% for message in messages %}
+												<div class="alert alert-danger" role="alert">
+													<span>{{ message }}</span>
+													<button type="button" class="close" data-dismiss="alert">&times;</button>
+												</div>
+											{% endfor %}
+										{% endif %}
+									{% endwith %}
 								</div>
 							</div>
 
 							<div class="form-row">
 								<div class="col-md-6 mb-3">
-									<label for="exampleFormControlInput1">Contraseña <label style="color:#FF0000"
-											;>*</label></label>
+									<label for="exampleFormControlInput1">
+										Contraseña <label style="color:#FF0000"
+												;>*</label>
+									</label>
 									<input type="password" class="form-control" id="input2" placeholder="Contraseña" name="passWd" required='required'>
+									{% with messages = get_flashed_messages(category_filter=["err-pw"]) %}
+									{% if messages %}
+									{% for message in messages %}
+									<div class="alert alert-danger" role="alert">
+										<span>{{ message }}</span>
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+									</div>
+									{% endfor %}
+									{% endif %}
+									{% endwith %}
 								</div>
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Repetir contraseña <label
@@ -69,18 +91,50 @@
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Nombre</label>
 									<input type="text" class="form-control" id="input4" name="nombre" placeholder="Nombre">
+									{% with messages = get_flashed_messages(category_filter=["err-nam"]) %}
+									{% if messages %}
+									{% for message in messages %}
+									<div class="alert alert-danger" role="alert">
+										<span>{{ message }}</span>
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+									</div>
+									{% endfor %}
+									{% endif %}
+									{% endwith %}
 								</div>
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Apellido</label>
 									<input type="text" class="form-control" id="input5" name="apellido" placeholder="Apellido">
+									{% with messages = get_flashed_messages(category_filter=["err-la-nam"]) %}
+									{% if messages %}
+									{% for message in messages %}
+									<div class="alert alert-danger" role="alert">
+										<span>{{ message }}</span>
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+									</div>
+									{% endfor %}
+									{% endif %}
+									{% endwith %}
 								</div>
 							</div>
 
 							<div class="form-row">
 								<div class="col-md-6 mb-3">
-									<label for="exampleFormControlInput1">Correo electonico <label style="color:#FF0000"
-											;>*</label></label>
+									<label for="exampleFormControlInput1">
+										Correo electonico <label style="color:#FF0000"
+											 ;>*</label>
+									</label>
 									<input type="email" class="form-control" id="input6" name="emailv" placeholder="ejemplo@midominio.com" required>
+									{% with messages = get_flashed_messages(category_filter=["err-email"]) %}
+									{% if messages %}
+									{% for message in messages %}
+									<div class="alert alert-danger" role="alert">
+										<span>{{ message }}</span>
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+									</div>
+									{% endfor %}
+									{% endif %}
+									{% endwith %}
 								</div>
 								<div class="col-md-6 mb-3">
 									<label for="exampleFormControlInput1">Telefono<label style="color:#FF0000"

@@ -4,6 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash #hashe
 from Artemisia import Class
 from Artemisia import Generic
 from Artemisia import db
+from Artemisia.Class import *
+from Artemisia.Generic import *
+
+def fakeobj():
+    return 'dummy obj'
 
 def search_user_register_info(**kwargs):
     if len(kwargs)!=0 and( kwargs.get('id')!=None or kwargs.get('username')!=None or kwargs.get('email')!=None):
@@ -36,50 +41,44 @@ def search_user_params(**kwargs):
             return None
         if data!=None and kwargs.get('search')!=None:
             res = dict()
-            for e in kwargs.get('search'):
-                for i in ['id','username','email','nombre','apellido','telefono','profesion','fecha_nacimiento','user_active','user_admin']:
-                   return getattr(data,i)
+            for e in kwargs.get('search'): 
+                if e in ['id','username','email','nombre','apellido','telefono','profesion','fecha_nacimiento','user_active','user_admin']:
+                   return getattr(data,e)
         else:
-            flash(f'No hay parametro a buscar, usuario inexistente')
+            flash(f'No hay parametro a buscar...')
             return None
     else:
         return None
 
-def add_user(Usuario,Contraseña,Email,**kwargs):
+def add_user(Usuario,Contraseña,Email,Celular,**kwargs):
     state=True
     U=User()
-    if verify(usuario=Usuario,email=Email,contraseña=Contraseña):
-        if User.query.filter_by(username=Usuario).first()==None:
+    if verify(username=Usuario,email=Email,password=Contraseña,celular=Celular):
+        if User.query.filter_by(username=Usuario).first()!=None:
             flash("Usuario ya registrado, elige otro usuario por favor.")
             state=False
         else:
             U.username=Usuario
-        if User.query.filter_by(email=Email).first()==None:
+        if User.query.filter_by(email=Email).first()!=None:
             flash("Email ya registrado, elige otro email por favor.")
             state=False
         else:
             U.email=Email
-        U.contraseña=generate_password_hash(Contraseña)
+        U.contrasena=generate_password_hash(Contraseña)
+        U.celular=Celular
+    else:
+        state=False
     for k,v in kwargs.items():
-        if k=='telefono':
-            if verify(telefono=v):
-                U.telefono=v
-        if k=='profesion':
-            if verify(profesion=v):
-                U.profesion=v
-        if k=='fecha_nacimiento':
-            if verify(fecha_nacimiento=v):
-                U.fecha_nacimiento=v
-        U.user_active=True
-        U.user_admin=False
-
-        try:
-            db.session.add(U)
-            db.session.commit()
-        except Exception as e:
-            print(e.message)
-
+            if k in ['nombre','apellido','profesion','fecha_nacimiento']:
+                if verify(**{k:v}):
+                    setattr(U,k,v)
+                else:
+                    state=False
+    if state:
+        db.session.add(U)
+        db.session.commit()
     return state
+ 
 
 def delete_user(*args,**kwargs):
     a=None
@@ -100,44 +99,69 @@ def delete_user(*args,**kwargs):
     except Exception as e:
         print(e.message)
         return False
-    
-#def modify_user(*args,**kwargs):
-#    state=False
-#    a=None
-#    try:
-#        if len(kwargs)>0 and len(args)==0:
-#            for k,v in kwargs.items():
-#                if k=='id':
-#                    a = User.query.get(v)
-#                    state = (a!=None)
-#        elif len(args)>0:	
-#            a = User.query.filter_by(username=args[0]).first()
-#            state=(a!=None)
 
-#        if state==True:
-#            for k,v in kwargs.items():
-#                if k=='username' and verify(username=v):
-#                    a.username=v
-#                if k=='contraseña' and verify(contraseña=v):
-#                    a.contraseña=generate_password_hash(v)
-#                if k=='nombre' and verify(nombre=v):
-#                    a.nombre=v
-#                if k=='apellido' and verify(apellido=v):
-#                    a.apellido=v
-#                if k=='email' and verify(email=v):
-#                    a.email=v
-#                if k=='celular' and verify(celular=v):
-#                    a.celular=v
-#                if k=='fecha_nacimiento' and verify(fecha_nacimiento=v):
-#                    a.fecha_nacimiento=v
-#                if k=='user_active':
-#                    a.user_active=bool(v)
-#                if k=='user_admin':
-#                    a.user_admin=bool(v)
-#            db.session.commit()	
-#            return True
+def modify_user(**kwargs):
+    data=None
+    if len(kwargs)!=0 and( kwargs.get('id')!=None or kwargs.get('username')!=None or kwargs.get('email')!=None):
+        type_lookup=None
+        res_lookup=None
+        for k,v in kwargs.items():
+            if not verify(**{k:v}):
+                flash(f'Formato del dato {k}:{v} erroneo')
+                return None
+        for i in ['id','username','email']:
+            if kwargs.get(i)!=None:
+                res_lookup=kwargs.get(i)
+                type_lookup=i
+                data=User.query.filter_by(**{i:v}).first()
+        if data==None:
+            flash(f'No existe un usuario en el sistema con los parametros {type_lookup} : {res_lookup}')
+        if data!=None and kwargs.get('modify')!=None:
+            for e in kwargs.get('modify'):
+                if e[0] in ['id','username','email','nombre','apellido','telefono','profesion','fecha_nacimiento','user_active','user_admin']:
+                   return setattr(data,e[0],e[1])
+                else:
+                    flash(f'No hay parametro a buscar, usuario inexistente')
+                    return None
+            else:
+                return None
+
+def modify_user(*args,**kwargs):
+    state=False
+    a=None
+    if len(kwargs)>0 and len(args)==0:
+        for k,v in kwargs.items():
+            if k=='id':
+                a = User.query.get(v)
+                state = (a!=None)
+    elif len(args)>0:	
+        a = User.query.filter_by(username=args[0]).first()
+        state=(a!=None)
+
+    if state==True:
+        for k,v in kwargs.items():
+            if k=='username' and verify(username=v):
+                a.username=v
+            if k=='contraseña' and verify(contraseña=v):
+                a.contraseña=generate_password_hash(v)
+            if k=='nombre' and verify(nombre=v):
+                a.nombre=v
+            if k=='apellido' and verify(apellido=v):
+                a.apellido=v
+            if k=='email' and verify(email=v):
+                a.email=v
+            if k=='celular' and verify(celular=v):
+                a.celular=v
+            if k=='fecha_nacimiento' and verify(fecha_nacimiento=v):
+                a.fecha_nacimiento=v
+            if k=='user_active':
+                a.user_active=bool(v)
+            if k=='user_admin':
+                a.user_admin=bool(v)
+        db.session.commit()	
+        return True
       
-        #def add_img(**kwargs):
+#def add_img(**kwargs):
 #def insertar_imagen(link, titulo1, tags1, descripcion1, estado1, ruta1, user_id1): #inserta imagen params(objeto_db, titulo, tags, ..., clave_foranea_usuario) 
 #    try:
 #        from app import Image
