@@ -12,8 +12,26 @@ db.create_all()
 
 @app.route("/", methods=['POST','GET'])
 def index():
-    return render_template('principal.html')
+    if (request.method == 'GET'):
+        lista_imagenes = obtenerImagenes()
+        return render_template('principal.html', lista_imagenes=lista_imagenes)
+    elif (request.method == 'POST'):
+        tag = str(request.form['tag'])
+        lista_imagenes = buscarImagenes(tag)
+        return render_template('principal.html', lista_imagenes=lista_imagenes)
 
+@app.route("/misImagenes", methods=['POST','GET'])
+def misImagenes():
+    mis_imagenes = obtenerMisImagenes()
+    return render_template('misImagenes.html', mis_imagenes=mis_imagenes)
+
+@app.route("/cerrarSesion", methods=['POST','GET'])
+def cerrarSesion():
+    session.pop("id",None)
+    session.pop("username",None)
+    session.pop("admin",None)
+    session.pop("correo",None)
+    return redirect('/')
 
 @app.route("/header.html", methods=['GET'])
 def header():
@@ -27,6 +45,10 @@ def footer():
 def login():
     try:
         error = None
+        session.pop("id",None)
+        session.pop("username",None)
+        session.pop("admin",None)
+        session.pop("correo",None)
         print(request.method)
         if request.method == 'POST':
             username = request.form['usuario']
@@ -36,6 +58,10 @@ def login():
             password = request.args.get['password']
 
         if(validar_login(username, password)):
+            print(session["id"])
+            print(session["username"])
+            print(session["admin"])
+            print(session["correo"])
             return redirect('/')
         else:
             error = "Usuario o contraseña incorrecto"
@@ -147,19 +173,22 @@ def subirImg():
     elif (request.method == 'POST'):
         try:
             titulo = str(request.form['titulo'])
+            titulo = titulo.upper()
             tags = str(request.form['tags'])
             descripcion = str(request.form['descripcion'])
+            descripcion = descripcion.capitalize()
             option = bool(request.form['estado'])
 
             # obtenemos el archivo del input "archivo"
             f = request.files['archivo']
             filename = f.filename
-            bytesVar = f.read()
+            filename = str(random.randint(100000, 1000000))+'-image-'+str(date.today())+'-'+filename
             # Guardamos el archivo en el directorio "Archivos PDF"
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # bytesVar = f.read()
             ruta = app.config['UPLOAD_FOLDER']+'/'+filename
             # Retornamos una respuesta satisfactoria
-            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':'1', 'binary':bytesVar})
+            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':session["id"]})
             flash("GUARDADA")
             return render_template('subirImg.html')
         except Exception as e:
@@ -168,5 +197,7 @@ def subirImg():
             return render_template('subirImg.html')
 
 @app.route("/verImagen", methods=['GET'])
-def vistaImg(titulo='Esto es un titulo de prueba', descripcion = 'Vacaciones en la playa con mi familia y amigos, celebramos año nuevo con muchos fuegos artificiales. Una de las mejores experiencias en mi vida.'):
-    return render_template('vistaImg.html', titulo=titulo, descripcion=descripcion)
+def vistaImg():
+    id = request.args.get('id')
+    lista_imagen = obtenerPorId(id)
+    return render_template('vistaImg.html', lista_imagen=lista_imagen)

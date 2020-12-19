@@ -35,6 +35,9 @@
     <Compile Include="Artemisia\Generic.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Artemisia\model.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Artemisia\views.py" />
     <Compile Include="Artemisia\__init__.py" />
     <Compile Include="runserver.py" />
@@ -81,6 +84,7 @@
     <Content Include="Artemisia\templates\footer.html" />
     <Content Include="Artemisia\templates\header.html" />
     <Content Include="Artemisia\templates\login.html" />
+    <Content Include="Artemisia\templates\misImagenes.html" />
     <Content Include="Artemisia\templates\principal.html" />
     <Content Include="Artemisia\templates\recuperarContra.html" />
     <Content Include="Artemisia\templates\recuperarContraOld.html" />
