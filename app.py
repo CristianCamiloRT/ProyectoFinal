@@ -241,3 +241,6 @@ def vistaImg():
     lista_imagen = obtenerPorId(id)
     return render_template('vistaImg.html', lista_imagen=lista_imagen)
 
+
+if __name__ == '__main__':
+    app.run(port=80, host='0.0.0.0')
