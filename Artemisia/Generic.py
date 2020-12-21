@@ -7,24 +7,25 @@ int_pattern=re.compile("^[0-9]+$")
 num_pattern=re.compile("^[+]?[0-9]+$")
 email_pattern=re.compile("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 usr_pattern=re.compile("^\w+$")
-nam_pattern=re.compile("^[a-zA-Z]+$")
+nam_pattern=re.compile("^(?![\s]+$)[a-zA-Z\s]*$")
 pw_pattern=re.compile("^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$")
 fecha_pattern=re.compile("^[-./\:?AMP \d]*$")
 
 from flask import flash
 
+#err-id
 def verify_id(id):
     a=re.match(int_pattern,id)
     logic=True
     if a==None:
         logic=False
         flash("Id invalido, no es un entero. No es admitido...",category='err-id')
-    return logic
+    return logic 
 
 def verify_name(name):
     a=re.match(nam_pattern,name)
     logic=True
-    if len(str(a))==0:
+    if len(str(name))==0:
         return True
     if a==None and name!=None:
         logic=False
@@ -34,7 +35,7 @@ def verify_name(name):
 def verify_last_name(last_name):
     a=re.match(nam_pattern,last_name)
     logic=True
-    if len(str(a))==0:
+    if len(str(last_name))==0:
         return True
     if a==None and last_name!=None:
         logic=False
@@ -53,9 +54,9 @@ def verify_fecha_nacimiento(fecha):
 def verify_profesion(profesion):
     a=re.match(usr_pattern,profesion)
     logic=True
-    if len(str(a))==0:
+    if len(str(profesion))==0:
         return True
-    if a==None and profesion!=None:
+    if a==None and (profesion!=None or profesion!=""):
         logic=False
         flash("Profesión invalida, no es alfanumérico el campo",category='err-prof') 
     return logic

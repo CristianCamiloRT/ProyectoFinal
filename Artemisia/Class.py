@@ -29,3 +29,7 @@ class Image(db.Model):
 	
 	def __repr__(self):
 		return '<Image %r>' % self.titulo
+
+class Filesystem(db.Model):
+	file_dir =db.Column(db.Integer, nullable=True)
+	dir=db.Column(db.String(255),primary_key=True)

@@ -5,8 +5,10 @@ from flask import render_template, flash, request, redirect, url_for
 import os, re, yagmail, random
 import Artemisia.database
 import Artemisia.Class
+import Artemisia.Forms
 from Artemisia.database import *
 from Artemisia import app,db
+from Artemisia.Forms import *
 
 db.create_all()
 
@@ -32,6 +34,22 @@ def cerrarSesion():
     session.pop("admin",None)
     session.pop("correo",None)
     return redirect('/')
+
+@app.route("/test",methods=['POST','GET'])
+def test():
+    a = RegisterForm()
+    if request.method == 'POST':
+       # if a.is_submitted():
+       #     print("Form successfully submitted")
+        if a.validate_on_submit():
+            if add_user(a.username.data,a.password.data,a.email.data,a.cellphone.data,**{'apellido':a.last_name.data,'nombre':a.name.data, 'profesion':a.profesion.data, 'fecha_nacimiento':a.date.data, 'user_active':True, 'user_admin':False}):
+                flash("Registro exitoso, ¡Accede con tus credenciales!")
+            return redirect("/")
+        else:  # You only want to print the errors since fail on validate
+            #print(a.errors.items())  
+            return render_template('/test.html', form=a)
+    elif request.method == 'GET':
+        return render_template('/test.html',form=a)
 
 @app.route("/header.html", methods=['GET'])
 def header():
@@ -125,36 +143,21 @@ def recuperarContra():
 
 @app.route("/registro", methods=['POST','GET'])
 def registro():
-    if (request.method == 'GET'):
-        return render_template('registro.html')
-    elif (request.method == 'POST'):
-        try:
-            passwd = str(request.form['passWd'])
-            passco = str(request.form['passConf'])
-            emailv = str(request.form['emailv'])
-            username = str(request.form['username'])
-            nombre = str(request.form['nombre'])
-            apellido = str(request.form['apellido'])
-            telefono = str(request.form['telefono'])
-            profesion = str(request.form['profesion'])
-            fecha = str(request.form['fecha'])
-            if(passwd==passco):
-                if add_user(username,passwd,emailv,telefono,**{'apellido':apellido, 'nombre':nombre, 'profesion':profesion, 'fecha_nacimiento':fecha, 'user_active':True, 'user_admin':False}):
-                    flash("registro correcto!")
-                    return render_template('principal.html')
-                return render_template('registro.html')
+    a = RegisterForm()
+    if request.method == 'POST':
+       # if a.is_submitted():
+       #     print("Form successfully submitted")
+        if a.validate_on_submit():
+            if add_user(a.username.data,a.password.data,a.email.data,a.cellphone.data,**{'apellido':a.last_name.data,'nombre':a.name.data, 'profesion':a.profesion.data, 'fecha_nacimiento':a.date.data, 'user_active':True, 'user_admin':False}):
+                flash("Registro exitoso, ¡Accede con tus credenciales!")
+                return redirect("/login")
             else:
-                flash("Las contraseñas no coinciden ")
-                return render_template('registro.html')
-
-        except Exception as e:
-            print(e)
-            se = str(e)
-            if(se.startswith("(sqlite3.IntegrityError) UNIQUE constraint failed: user.username")): 
-                flash("Error en el registro (Ya existe el nombre de usuario)")
-            if(se.startswith("(sqlite3.IntegrityError) UNIQUE constraint failed: user.email")):
-                flash("Error en el registro (Correo ya registrado)")
-            return render_template('registro.html')
+                return render_template('/registro.html', form=a)
+        else:  # You only want to print the errors since fail on validate
+            #print(a.errors.items())  
+            return render_template('/registro.html', form=a)
+    elif request.method == 'GET':
+        return render_template('/registro.html',form=a)
 
 
 @app.route("/subirImagen", methods=['POST','GET'])

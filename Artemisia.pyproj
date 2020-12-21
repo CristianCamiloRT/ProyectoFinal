@@ -32,6 +32,9 @@
     <Compile Include="Artemisia\Class.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Artemisia\Forms.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Artemisia\Generic.py">
       <SubType>Code</SubType>
     </Compile>
@@ -90,6 +93,7 @@
     <Content Include="Artemisia\templates\recuperarContraOld.html" />
     <Content Include="Artemisia\templates\registro.html" />
     <Content Include="Artemisia\templates\subirImg.html" />
+    <Content Include="Artemisia\templates\test.html" />
     <Content Include="Artemisia\templates\vistaImg.html" />
     <Content Include="requirements.txt" />
   </ItemGroup>
