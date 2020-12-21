@@ -1,3 +1,4 @@
+import os
 from flask_sqlalchemy import SQLAlchemy #base de datos (es la libreria SQLalchemy de python totalmente compatible con flask)
 from flask import flash
 from werkzeug.security import generate_password_hash, check_password_hash #hashes criptograficamente seguros
@@ -7,69 +8,26 @@ from Artemisia import db
 from Artemisia.Class import *
 from Artemisia.Generic import *
 
-def fakeobj():
-    return 'dummy obj'
-
-def search_user_register_info(**kwargs):
-    if len(kwargs)!=0 and( kwargs.get('id')!=None or kwargs.get('username')!=None or kwargs.get('email')!=None):
-        for k,v in kwargs.items():
-            if not verify(**{k:v}):
-                flash(f'Parametro {k} con formato inválido')
-                return None
-            for i in ['id','username','email']:
-                if kwargs.get(i)!=None:
-                    return User.query.filter_by(**{i:v}).first()
-    else:
-        flash('No se ingresó un parámetro valido de busqueda...')
-        return None
-
-def search_user_params(**kwargs):
-    data=None
-    if len(kwargs)!=0 and( kwargs.get('id')!=None or kwargs.get('username')!=None or kwargs.get('email')!=None):
-        type_lookup=None
-        res_lookup=None
-        for k,v in kwargs.items():
-            if not verify(**{k:v}):
-                return None
-        for i in ['id','username','email']:
-            if kwargs.get(i)!=None:
-                res_lookup=kwargs.get(i)
-                type_lookup=i
-                data=User.query.filter_by(**{i:v}).first()
-        if data==None:
-            flash(f'No existe un usuario con el parametro {type_lookup} : {res_lookup} ingresado')
-            return None
-        if data!=None and kwargs.get('search')!=None:
-            res = dict()
-            for e in kwargs.get('search'): 
-                if e in ['id','username','email','nombre','apellido','telefono','profesion','fecha_nacimiento','user_active','user_admin']:
-                   return getattr(data,e)
-        else:
-            flash(f'No hay parametro a buscar...')
-            return None
-    else:
-        return None
-
 def add_user(Usuario,Contraseña,Email,Celular,**kwargs):
     state=True
     U=User()
-    if verify(username=Usuario,email=Email,password=Contraseña,celular=Celular):
+    if verify(username=Usuario,email=Email,password=Contraseña,cellphone=Celular):
         if User.query.filter_by(username=Usuario).first()!=None:
             flash("Usuario ya registrado, elige otro usuario por favor.")
             state=False
         else:
-            U.username=Usuario
+            U.username=Usuario.lower()
         if User.query.filter_by(email=Email).first()!=None:
             flash("Email ya registrado, elige otro email por favor.")
             state=False
         else:
-            U.email=Email
-        U.contrasena=generate_password_hash(Contraseña)
-        U.celular=Celular
+            U.email=Email.lower()
+        U.password=generate_password_hash(Contraseña)
+        U.cellphone=Celular
     else:
         state=False
     for k,v in kwargs.items():
-            if k in ['nombre','apellido','profesion','fecha_nacimiento']:
+            if k in ['name','last_name','profession','birth_date']:
                 if verify(**{k:v}):
                     setattr(U,k,v)
                 else:
@@ -78,88 +36,101 @@ def add_user(Usuario,Contraseña,Email,Celular,**kwargs):
         db.session.add(U)
         db.session.commit()
     return state
- 
 
-def delete_user(*args,**kwargs):
+def lower_fix(param):
+    return str(param).lower()
+
+def get_user_id(data,flag='username'):
+    if flag=='username':
+        return User.query.filter_by(username=data).first().id
+    if flag=='email':
+        return User.query.filter_by(email=data).first().id
+    if flag=='id':
+        return data
+    return None
+
+def delete_user(data,flag='username'):
     a=None
     state=False
-    try:
-        if len(kwargs)>0:
-            for k,v in kwargs.items():
-                if k=='id':
-                    a = User.query.get(v)
-                    state=True
-        elif len(args)>0:	
-            a = User.query.filter_by(username=args[0]).first()
-            state=True
-        if state==True:
-            db.session.delete(a)
-            db.session.commit()	
-            return True
-    except Exception as e:
-        print(e.message)
-        return False
-
-def modify_user(**kwargs):
-    data=None
-    if len(kwargs)!=0 and( kwargs.get('id')!=None or kwargs.get('username')!=None or kwargs.get('email')!=None):
-        type_lookup=None
-        res_lookup=None
-        for k,v in kwargs.items():
-            if not verify(**{k:v}):
-                flash(f'Formato del dato {k}:{v} erroneo')
-                return None
-        for i in ['id','username','email']:
-            if kwargs.get(i)!=None:
-                res_lookup=kwargs.get(i)
-                type_lookup=i
-                data=User.query.filter_by(**{i:v}).first()
-        if data==None:
-            flash(f'No existe un usuario en el sistema con los parametros {type_lookup} : {res_lookup}')
-        if data!=None and kwargs.get('modify')!=None:
-            for e in kwargs.get('modify'):
-                if e[0] in ['id','username','email','nombre','apellido','telefono','profesion','fecha_nacimiento','user_active','user_admin']:
-                   return setattr(data,e[0],e[1])
-                else:
-                    flash(f'No hay parametro a buscar, usuario inexistente')
-                    return None
-            else:
-                return None
-
-def modify_user(*args,**kwargs):
-    state=False
-    a=None
-    if len(kwargs)>0 and len(args)==0:
-        for k,v in kwargs.items():
-            if k=='id':
-                a = User.query.get(v)
-                state = (a!=None)
-    elif len(args)>0:	
-        a = User.query.filter_by(username=args[0]).first()
-        state=(a!=None)
-
+    if len(data)>0:
+        a=User.query.get(get_user_id(data,flag))
+        state=True
     if state==True:
-        for k,v in kwargs.items():
-            if k=='username' and verify(username=v):
-                a.username=v
-            if k=='contraseña' and verify(contraseña=v):
-                a.contraseña=generate_password_hash(v)
-            if k=='nombre' and verify(nombre=v):
-                a.nombre=v
-            if k=='apellido' and verify(apellido=v):
-                a.apellido=v
-            if k=='email' and verify(email=v):
-                a.email=v
-            if k=='celular' and verify(celular=v):
-                a.celular=v
-            if k=='fecha_nacimiento' and verify(fecha_nacimiento=v):
-                a.fecha_nacimiento=v
-            if k=='user_active':
-                a.user_active=bool(v)
-            if k=='user_admin':
-                a.user_admin=bool(v)
+        db.session.delete(a)
         db.session.commit()	
         return True
+    return state
+
+def check_login(user,password):
+    U=User.query.filter_by(username=user.lower()).first()
+    if verify(username=user,password=password):
+        if check_password_hash(U.password,password):
+            return True
+    flash("Usuario o contraseña erroneo",category="login")
+    return False
+
+def search_entry(data,flag='username'):
+    id=get_user_id(data,flag)
+    if id!=None:
+        return User.query.get(id)
+    return None
+
+def get_user_param(data,flag='username',param_to_search='username'):
+    if param_to_search in ['name','id','last_name','birth_date','cellphone','profession','password','username','email','user_active','user_admin']:
+        db_info=search_entry(data,flag)
+        return getattr(db_info,param_to_search)
+    else:
+        return None
+
+def modify_user_param(data,flag='username',param_to_modify=None,new_value=None):
+    if param_to_modify in ['name','id','last_name','birth_date','cellphone','profession','password','username','email','user_active','user_admin']:
+        db_info=search_entry(data,flag)
+        if db_info!=None and new_value!=None and verify(**{param_to_modify:new_value}):
+            if param_to_modify in ['username','email']:
+                lower(new_value)
+            setattr(db_info,param_to_modify,new_value)
+            db.session.update(db_info)
+            db.session,commit()
+            return True
+        return False
+    return False
+
+def save_file(file):
+    return False
+
+def get_by_img_id(id):
+    return Image.query.get(id)
+
+def get_all_img():
+    return Image.query.all()
+
+def get_img(data, flag=None):
+    if flag!=None and flag in ['user_id','binary','path','ext','name', 'public','description','tags','title','id']:
+        return Image.query.filter_by(**{flag:data}).all()
+
+def add_img(title,tags,binary,description,public,user_id):
+    state=True
+    a=Image()
+    if img_verify(title):
+        a.title=title
+    else:
+        state=False
+    if img_verify(tags,"tags"):
+        a.tags=tags
+    else:
+        state=False
+    a.binary=binary.read()
+    a.description=description
+    a.public=bool(public)
+    a.user_id=user_id
+    a.ext=os.path.splitext(binary.filename)[1]
+    a.name=os.path.splitext(binary.filename)[0]
+    a.path="/static/images/"+a.name+a.ext
+    a.user_id=user_id
+    if state:
+        db.session.add(a)
+        db.session.commit()
+    return state
       
 #def add_img(**kwargs):
 #def insertar_imagen(link, titulo1, tags1, descripcion1, estado1, ruta1, user_id1): #inserta imagen params(objeto_db, titulo, tags, ..., clave_foranea_usuario) 
@@ -228,9 +199,3 @@ def modify_user(*args,**kwargs):
 #        return False
 #    return True
     
-#def check_login(user,password):
-#    U=User.query.filter_by(username=user).first()
-#    if verify(username=user,contraseña=password):
-#        if check_password_hash(U.contraseña,password):
-#            return True
-#    return False

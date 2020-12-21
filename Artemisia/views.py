@@ -1,7 +1,7 @@
 """
 Routes and views for the flask application.
 """
-from flask import render_template, flash, request, redirect, url_for
+from flask import render_template, flash, request, redirect, url_for,session
 import os, re, yagmail, random
 import Artemisia.database
 import Artemisia.Class
@@ -15,8 +15,8 @@ db.create_all()
 @app.route("/", methods=['POST','GET'])
 def index():
     if (request.method == 'GET'):
-        lista_imagenes = fakeobj() #obtenerImagenes()
-        return render_template('principal.html', lista_imagenes=lista_imagenes)
+        images = get_all_img() #obtenerImagenes()
+        return render_template('principal.html', images=images, target='db')
     elif (request.method == 'POST'):
         tag = str(request.form['tag'])
         lista_imagenes = buscarImagenes(tag)
@@ -35,22 +35,6 @@ def cerrarSesion():
     session.pop("correo",None)
     return redirect('/')
 
-@app.route("/test",methods=['POST','GET'])
-def test():
-    a = RegisterForm()
-    if request.method == 'POST':
-       # if a.is_submitted():
-       #     print("Form successfully submitted")
-        if a.validate_on_submit():
-            if add_user(a.username.data,a.password.data,a.email.data,a.cellphone.data,**{'apellido':a.last_name.data,'nombre':a.name.data, 'profesion':a.profesion.data, 'fecha_nacimiento':a.date.data, 'user_active':True, 'user_admin':False}):
-                flash("Registro exitoso, ¡Accede con tus credenciales!")
-            return redirect("/")
-        else:  # You only want to print the errors since fail on validate
-            #print(a.errors.items())  
-            return render_template('/test.html', form=a)
-    elif request.method == 'GET':
-        return render_template('/test.html',form=a)
-
 @app.route("/header.html", methods=['GET'])
 def header():
     return render_template('header.html')
@@ -61,35 +45,34 @@ def footer():
 
 @app.route("/login", methods=['POST','GET'])
 def login():
-    try:
-        error = None
+    session=None
+    a=LoginForm()
+    if(session!=None):
         session.pop("id",None)
         session.pop("username",None)
         session.pop("admin",None)
         session.pop("correo",None)
-        print(request.method)
-        if request.method == 'POST':
-            username = request.form['usuario']
-            password = request.form['password']
-        else:
-            username = request.args.get['usuario']
-            password = request.args.get['password']
-
-        if(validar_login(username, password)):
-            print(session["id"])
-            print(session["username"])
-            print(session["admin"])
-            print(session["correo"])
-            return redirect('/')
-        else:
-            error = "Usuario o contraseña incorrecto"
-            print(error)
-            flash(error)  
-            return render_template('login.html')        
-    except Exception as e:
-        print(e)
-        return render_template('login.html')
-    return render_template('login.html')
+    if request.method == 'POST':
+        if a.is_submitted():
+            if check_login(a.username.data,a.password.data):
+                flash("¡Has accedido correctamente!")
+                return redirect("/")
+            else:
+                return render_template('/login.html', form=a)
+        else:  # You only want to print the errors since fail on validate
+            #print(a.errors.items())  
+            return render_template('/login.html', form=a)
+    elif request.method == 'GET':
+        return render_template('/login.html',form=a)
+    #if(verify_login(username, password)):
+    #    print(session["id"])
+    #    print(session["username"])
+    #    print(session["admin"])
+    #    print(session["correo"])
+    #    return redirect('/')
+    #else:
+        #return render_template('login.html',form=a)        
+    #return render_template('login.html',form=a)
 
 @app.route("/recuperarContra", methods=['POST','GET'])
 def recuperarContra():
@@ -148,8 +131,8 @@ def registro():
        # if a.is_submitted():
        #     print("Form successfully submitted")
         if a.validate_on_submit():
-            if add_user(a.username.data,a.password.data,a.email.data,a.cellphone.data,**{'apellido':a.last_name.data,'nombre':a.name.data, 'profesion':a.profesion.data, 'fecha_nacimiento':a.date.data, 'user_active':True, 'user_admin':False}):
-                flash("Registro exitoso, ¡Accede con tus credenciales!")
+            if add_user(a.username.data,a.password.data,a.email.data,a.cellphone.data,**{'last_name':a.last_name.data,'name':a.name.data, 'profession':a.profesion.data, 'birth_date':a.date.data, 'user_active':True, 'user_admin':False}):
+                flash("Registro exitoso, ¡Accede con tus credenciales!",category="login")
                 return redirect("/login")
             else:
                 return render_template('/registro.html', form=a)
@@ -162,36 +145,33 @@ def registro():
 
 @app.route("/subirImagen", methods=['POST','GET'])
 def subirImg():
-    if (request.method == 'GET'):
-        return render_template('subirImg.html')
-    elif (request.method == 'POST'):
-        try:
-            titulo = str(request.form['titulo'])
-            titulo = titulo.upper()
-            tags = str(request.form['tags'])
-            descripcion = str(request.form['descripcion'])
-            descripcion = descripcion.capitalize()
-            option = bool(request.form['estado'])
+    imf=ImageForm()
+    if request.method == 'POST':
+        if imf.validate_on_submit():
+            if add_img(imf.title.data,imf.tags.data,imf.binary.data,imf.description.data,imf.public.data,"3"):
+                flash("Carga de imagen exitosa")
+                return render_template('/subirImg.html', form=imf)
+            else:
+                return render_template('/subirImg.html', form=imf)
+        else:  
+            return render_template('/subirImg.html', form=imf)
+    elif request.method == 'GET':
+        return render_template('/subirImg.html',form=imf)
+ 
+@app.route("/verImagen/<int:id>", methods=['GET'])
+def vistaImg(id):
+    im=[get_by_img_id(id)]
+    username=get_user_param(get_by_img_id(id).user_id,flag='id',param_to_search='username')
+    return render_template('vistaImg.html', imagen=im,usr=username)
 
-            # obtenemos el archivo del input "archivo"
-            f = request.files['archivo']
-            filename = f.filename
-            filename = str(random.randint(100000, 1000000))+'-image-'+str(date.today())+'-'+filename
-            # Guardamos el archivo en el directorio "Archivos PDF"
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # bytesVar = f.read()
-            ruta = app.config['UPLOAD_FOLDER']+'/'+filename
-            # Retornamos una respuesta satisfactoria
-            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':session["id"]})
-            flash("GUARDADA")
-            return render_template('subirImg.html')
-        except Exception as e:
-            print(e)
-            flash(str(e))
-            return render_template('subirImg.html')
+@app.route("/test", methods=['POST','GET'])
+def test():
+    if request.method == 'GET':
+        images=list(get_all_img())
 
-@app.route("/verImagen", methods=['GET'])
-def vistaImg():
-    id = request.args.get('id')
-    lista_imagen = obtenerPorId(id)
-    return render_template('vistaImg.html', lista_imagen=lista_imagen)
+        return render_template('/test.html', images=images, target='db')
+
+@app.route("/img/db/<int:id>")
+def im_db(id):
+    res=get_by_img_id(id)
+    return app.response_class(res.binary,mimetype='application/octet-stream')

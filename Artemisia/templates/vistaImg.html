@@ -1,58 +1,118 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ver Imagen</title>
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
 </head>
-
-
 <body>
     <script type="text/javascript" src="../static/js/jquery.min.js"></script>
     <script type="text/javascript" src="../static/js/popper.min.js"></script>
     <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../static/js/includeHtml.js"></script>
 
-    <div w3-include-html="header.html"></div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">ARTEMISIA</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <script>
-        includeHTML();
-    </script>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                {% if "username" in session %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Imagenes
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/misImagenes">Mis Imagenes</a>
+                        <a class="dropdown-item" href="/subirImagen">Subir Imagenes</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Configuración
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/registro">Cambiar contraseña</a>
+                        <a class="dropdown-item" href="/registro">Modificar datos</a>
+                    </div>
+                </li>
+                {% endif %}
+                {% if "username" not in session %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/registro">Registrate<span class="sr-only">(current)</span></a>
+                </li>
+                {% endif %}
 
+            </ul>
+            <form class="form-inline my-2 my-lg-0" method="POST" action="/">
+                <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search" name="tag">
+                <button class="btn btn-outline-success my-2 my-sm-0 mr-sm-2" type="submit">Buscar</button>
+                {% if "username" not in session %}
+                <a href="/login"><button type="button" class="btn btn-outline-info">Ingresar</button></a>
+                {% endif %}
+            </form>
+            <ul class="navbar-nav">
+                {% if "username" in session %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{session["username"]}}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/cerrarSesion">Salir</a>
+                    </div>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
 
     <main role="main">
         <div class="album py-5 bg-light">
             <div class="container">
                 <div class="row justify-content-center">
-                    {% for elemento in lista_imagen %}
-                        <div class="col-md-10">
-                            <div class="card-header"><b>{{elemento.titulo}}</b></div>
-                            <div class="card mb-4 shadow-sm">
-                                <img src={{elemento.ruta}} alt="" width="100%" height="auto">
-                                <div class="card-body">
-                                    <p class="card-text">{{elemento.descripcion}}
-                                    </p>
-                                    <div class="d-flex justify-content-between align-items-center d-flex align-content-start flex-wrap">
-                                        <div class="btn-group">
-                                            <a href={{elemento.ruta}} download><button type="button" class="btn btn-sm btn-outline-secondary">Descargar</button></a>
-                                        </div>
-                                        <small class="text-muted">Created by xX_darthAnakin_Xx - 9 mins ago</small>
+                    {% for e in imagen %}
+                    <div class="col-md-10">
+                        <div class="card-header"><b>{{e['title']}}</b></div>
+                        <div class="card mb-4 shadow-sm">
+                            <img src={{url_for('im_db', id=e['id'])}} alt="" width="100%" height="auto">
+                            <div class="card-body">
+                                <p class="card-text">
+                                    {{e['description']}}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center d-flex align-content-start flex-wrap">
+                                    <div class="btn-group">
+                                        <a href={{url_for('im_db', id=e['id'])}} download><button type="button" class="btn btn-sm btn-outline-secondary">Descargar</button></a>
                                     </div>
+                                    <small class="text-muted">Uploaded by {{usr}}</small>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </main>
 
 
-    <div w3-include-html="footer.html"></div>
+    <footer class="text-muted">
+        <div class="container">
+            <p class="float-right">
+                <a href="#">Volver arriba</a>
+            </p>
+            <p>Esto es  &copy;Artemisia, disfruta de nuestra gran variedad de imagenes!</p>
+            <p>Nuevo en  &copy;Artemisia? <a href="/registro">Registrate</a> o explora sin registrarte <a href="/"> Explorar Artemisia</a>.</p>
+        </div>
+    </footer>
 
-    <script>
-        includeHTML();
-    </script>
+
+
 </body>
+</html>

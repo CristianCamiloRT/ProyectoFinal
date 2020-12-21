@@ -1,60 +1,82 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Principal</title>
-
-    <link rel="icon" href="/docs/4.1/assets/img/favicons/favicon.ico">
-
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.1/examples/sign-in/">
-
+    <title>Login</title>
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
 
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="../static/css/signin.css">
-    <script> 
-		function desaparecer(){
-			var x = document.getElementsByClassName('gonettt');
-			for(i=0;i<x.length;i++)x[i].style.display='none';
-			}
-	</script>
-  </head>
+    <script>
+        function desaparecer() {
+            var x = document.getElementsByClassName('gonettt');
+            for (i = 0; i < x.length; i++)x[i].style.display = 'none';
+        }
+    </script>
+   
+</head>
 
-  <body class="text-center">
-    <form class="form-signin" name="formulario" action="{{url_for('login')}}" method="POST">
-      <a href="/"><img class="mb-4" src="../static/images/logo.jpg" alt="" width="150" height="150"></a>
-      <h1 class="h3 mb-3 font-weight-normal">Inicia sesión en Artemisia</h1>
-      <label for="usuario" class="sr-only">Email address</label>
-      <input type="text" id="usuario" name="usuario" class="form-control" placeholder="Nombre de usuario" required autofocus>
-      <label for="password" class="sr-only">Password</label>
-      <input type="password" id="password" name="password" class="form-control" placeholder="Contraseña" required>
-      {% with messages = get_flashed_messages() %}
+<body class="text-center">
+    <form class="form-signin" action="{{url_for('login')}}" method="POST">
+        {{form.hidden_tag() }}
+        <a href="/"><img class="mb-4" src="../static/images/logo.jpg" alt="" width="150" height="150"></a>
+        <h1 class="h3 mb-3 font-weight-normal">Inicia sesión en Artemisia</h1>
+        <label class="sr-only">{{form.username.label}}</label>
+        {{form.username(placeholder='Nombre de usuario',class="form-control",autofocus="true",id="username") }}
+        <br />
+        <label class="sr-only">{{form.password.label}}</label>
+        {{form.password(placeholder='Contraseña',class="form-control",id="password",type="password") }}
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-danger gonettt" role="alert">
-                    <span>{{ message }}</span>
-                    <button type="button" class="close" data-dismiss="alert" onclick='desaparecer()'>&times;</button>
-                    </button>
-                </div>
-            {% endfor %}
+        {% for category,message in messages %}
+        {% if category=="login" %}
+        <div class="alert alert-danger gonettt" role="alert">
+            <span>{{ message }}</span>
+            <button type="button" class="close" data-dismiss="alert" onclick='desaparecer()'>&times;</button>
+        </div>
         {% endif %}
-      {% endwith %}
-      <div class="checkbox mb-3">
-        <label>
-          <input type="checkbox" value="Recordarme"> Recordarme
-        </label>
-      </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit" name="enviar">Ingresar</button><br>
-      <a href="recuperarContra">Olvide mi contraseña</a><br>
-      <a href="registro">Registrate</a>
-      <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <br/>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Acceder</button><br>
+        <a href="recuperarContra">Olvide mi contraseña</a><br>
+        <a href="registro">Registrate</a>
+        <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
     </form>
 
-    
-  </body>
+    <script>
+        $(function () {
+
+            if (localStorage.chkbx && localStorage.chkbx != '') {
+                $('#remember_me').attr('checked', 'checked');
+                $('#username').val(localStorage.usrname);
+                $('#password').val(localStorage.pass);
+            } else {
+                $('#remember_me').removeAttr('checked');
+                $('#username').val('');
+                $('#password').val('');
+            }
+
+            $('#remember_me').click(function () {
+
+                if ($('#remember_me').is(':checked')) {
+                    // save username and password
+                    localStorage.usrname = $('#usr').val();
+                    localStorage.pass = $('#pwd').val();
+                    localStorage.chkbx = $('#remember_me').val();
+                } else {
+                    localStorage.usrname = '';
+                    localStorage.pass = '';
+                    localStorage.chkbx = '';
+                }
+            });
+        });
+    </script>
+</body>
 
 
 </html>

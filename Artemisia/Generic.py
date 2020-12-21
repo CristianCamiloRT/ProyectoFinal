@@ -10,7 +10,8 @@ usr_pattern=re.compile("^\w+$")
 nam_pattern=re.compile("^(?![\s]+$)[a-zA-Z\s]*$")
 pw_pattern=re.compile("^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$")
 fecha_pattern=re.compile("^[-./\:?AMP \d]*$")
-
+title_img_pattern=re.compile("^(?![\s]+$)[a-zA-Z\s]*$")
+tag_img_pattern=re.compile("^(?![\s,]+$)[a-zA-Z\s,]*$")
 from flask import flash
 
 #err-id
@@ -42,8 +43,7 @@ def verify_last_name(last_name):
         flash("Apellido invalido, no es alfanumérico el campo",category='err-la-nam') 
     return logic
 
-
-def verify_fecha_nacimiento(fecha):
+def verify_birth_date(fecha):
     a=re.match(fecha_pattern,fecha)
     logic=True
     if a==None and fecha!=None:
@@ -51,7 +51,7 @@ def verify_fecha_nacimiento(fecha):
         flash("Formato de fecha invalido",category='err-date')
     return logic
 
-def verify_profesion(profesion):
+def verify_profession(profesion):
     a=re.match(usr_pattern,profesion)
     logic=True
     if len(str(profesion))==0:
@@ -110,12 +110,34 @@ def verify(**kwargs):
             state = state and verify_username(v)
         if k=="email":
             state = state and verify_email(v)
-        if k=="celular":
+        if k=="cellphone":
             state = state and verify_cellphone(v)
-        if k=='profesion':
-            state = state and verify_profesion(v)
-        if k=='fecha_nacimiento':
-            state = state and verify_fecha_nacimiento(v)
+        if k=='profession':
+            state = state and verify_profession(v)
+        if k=='birth_date':
+            state = state and verify_birth_date(v)
         if k=='id':
             state = state and verify_id(v)
+    return state
+
+def img_verify_title(title):
+    if title!=None:
+        if re.match(title_img_pattern,title):
+            return True
+        return False
+    return False
+
+def img_verify_tags(tags):
+    if tags!=None:
+        if re.match(tag_img_pattern,tags):
+            return True
+        return False
+    return False
+
+def img_verify(data,flag="title"):
+    state=True
+    if flag=='title':
+        state = state and img_verify_title(data)
+    if flag=='tags':
+        state = state and img_verify_tags(data)
     return state

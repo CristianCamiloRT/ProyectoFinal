@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -28,8 +28,6 @@
                     <div class="alert alert-warning" role="alert">
                         <span>{{ message }}</span>
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <!-- <span aria-hidden="true">&times;</span> -->
-                        </button>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -37,55 +35,53 @@
         <div class="album py-5 bg-light">
             <div class="container">
                 <div class="card border-dark mb-3" style="max-width: 80rem;">
-                    <div class="card-header">Subir Imagen</div>
+                    <div class="card-header"><h2><b>Subir imagen</b></h2></div>
                         <div class="card-body text-dark">
-                            <h5 class="card-title">Diligencia toda la información</h5><br><br>
+                            <h5 class="card-title"><b>Diligencia toda la información</b></h5><br><br>
                             <form action="{{url_for('subirImg')}}" method="POST" enctype="multipart/form-data">
+                                {{ form.hidden_tag() }}
                                 <div class="form-row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="validationDefault01"><b>Titulo Imagen</b></label>
-                                        <input type="text" class="form-control" id="validationDefault01"
-                                            placeholder="Titulo Imagen" value="" name="titulo" required>
+                                        <label><b>{{form.title.label}}</b></label>
+                                        {{form.title(placeholder="Titulo de la imágen",autofocus=true,required="true",class="form-control")}}
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="validationDefault02"><b>Tag's</b> <small> Palabras claves separadas por
-                                                comas (,)</small></label>
-                                        <input type="text" class="form-control" id="validationDefault02" placeholder="Tag's"
-                                            value="" name="tags" required>
+                                        <label>
+                                            <b>{{form.tags.label}}</b> <small>Palabras claves separadas por comas (,)</small>
+                                        </label>
+                                        {{form.tags(placeholder="Tag's",required="true",class="form-control")}}
                                     </div>
                                 </div><br>
                                 <div class="form-row">
                                     <div class="col-md-12 mb-3">
                                         <div class="form-group">
-                                            <label for="exampleFormControlTextarea1"><b>Escribe una descripción de la
-                                                    imagen</b></label>
-                                            <textarea class="form-control" id="exampleFormControlTextarea1"
-                                                rows="3" name="descripcion" required></textarea>
+                                            <label>
+                                                <b>{{form.description.label}}</b>
+                                            </label>
+                                            {{form.description(placeholder="Escribe una descripción de la imagen",class="form-control",rows="3")}}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleFormControlFile1"><b>Seleccione imagen a subir</b></label>
-                                    <input type="file" class="form-control-file" id="exampleFormControlFile1"
-                                        accept="image/*" name="archivo" required>
+                                    <label>
+                                        <b>{{form.binary.label}}</b>
+                                    </label>
+                                    {{form.binary(accept='image/*',class="form-control-file",type="file",required="true")}}
                                 </div><br>
                                 <fieldset class="form-group">
                                     <div class="row">
-                                        <legend class="col-form-label col-sm-2 pt-0"><b>Estado de la imagen:</b></legend>
+                                        <div class="col-form-label col-sm-2 pt-0"><b>{{form.public.label}}</b></div>
                                         <div class="col-sm-10">
-                                            <select class="browser-default custom-select" name="estado">
-                                                <option value="1">Publica</option>
-                                                <option value="0">Privada</option>
-                                            </select>
+                                            {{form.public()}}
                                         </div>
                                     </div>
                                 </fieldset><br><br>
 
-                                <button class="btn btn-primary" type="submit">Subir Imagen</button>
+                                <button class="btn btn-primary" type="submit">Enviar imagen a Artemisia</button>
                             </form>
                         </div>
-                    </div>
-                </div>
+                   </div>
             </div>
         </div>
     </main>
