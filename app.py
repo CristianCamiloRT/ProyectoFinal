@@ -216,7 +216,12 @@ def subirImg():
             tags = str(request.form['tags'])
             descripcion = str(request.form['descripcion'])
             descripcion = descripcion.capitalize()
-            option = bool(request.form['estado'])
+            option = str(request.form['estado'])
+
+            if option == "publica":
+                optionF = True
+            else:
+                optionF = False
 
             # obtenemos el archivo del input "archivo"
             f = request.files['archivo']
@@ -227,7 +232,7 @@ def subirImg():
             # bytesVar = f.read()
             ruta = app.config['UPLOAD_FOLDER']+'/'+filename
             # Retornamos una respuesta satisfactoria
-            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':option, 'ruta':ruta, 'user_id':session["id"]})
+            insertar_imagen_facil(db, titulo, {'tags':tags, 'descripcion':descripcion, 'estado':optionF, 'ruta':ruta, 'user_id':session["id"]})
             flash("GUARDADA")
             return render_template('subirImg.html')
         except Exception as e:
