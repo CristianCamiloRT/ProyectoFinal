@@ -164,9 +164,13 @@ def subirImg():
     imf=ImageForm()
     if request.method == 'POST':
         if imf.validate_on_submit():
-            if add_img(imf.title.data,imf.tags.data,imf.binary.data,imf.description.data,imf.public.data,"3"):
-                flash("Carga de imagen exitosa")
-                return render_template('/subirImg.html', form=imf)
+            if 'user_id' in session:
+                if add_img(imf.title.data,imf.tags.data,imf.binary.data,imf.description.data,imf.public.data,session('user_id')):
+                    flash("Carga de imagen exitosa")
+                    return render_template('/subirImg.html', form=imf)
+                else:
+                    flash("No estás logueado, no puedes subir fotos al sistema.")
+                    return render_template('/subirImg.html', form=imf)
             else:
                 return render_template('/subirImg.html', form=imf)
         else:  
