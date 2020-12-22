@@ -15,16 +15,16 @@ db.create_all()
 @app.route("/", methods=['POST','GET'])
 def index():
     if (request.method == 'GET'):
-        images = get_all_img() #obtenerImagenes()
+        images = get_all_img()
         return render_template('principal.html', images=images, target='db')
     elif (request.method == 'POST'):
         tag = str(request.form['tag'])
-        lista_imagenes = buscarImagenes(tag)
-        return render_template('principal.html', lista_imagenes=lista_imagenes)
+        images = search_img(tag)
+        return render_template('principal.html', images=images, target='db')
 
 @app.route("/misImagenes", methods=['POST','GET'])
 def misImagenes():
-    mis_imagenes = obtenerMisImagenes()
+    mis_imagenes = get_usr_img()
     return render_template('misImagenes.html', mis_imagenes=mis_imagenes)
 
 @app.route("/cerrarSesion", methods=['POST','GET'])
@@ -45,7 +45,6 @@ def footer():
 
 @app.route("/login", methods=['POST','GET'])
 def login():
-    session=None
     a=LoginForm()
     if(session!=None):
         session.pop("id",None)
@@ -55,75 +54,92 @@ def login():
     if request.method == 'POST':
         if a.is_submitted():
             if check_login(a.username.data,a.password.data):
+                var=search_entry(a.username.data)
+                session['username']=var.username
+                session['user_id']=var.id
+                session['email']=var.email
+                session['user_admin']=var.user_admin
                 flash("¡Has accedido correctamente!")
                 return redirect("/")
             else:
                 return render_template('/login.html', form=a)
-        else:  # You only want to print the errors since fail on validate
-            #print(a.errors.items())  
+        else:
             return render_template('/login.html', form=a)
     elif request.method == 'GET':
         return render_template('/login.html',form=a)
-    #if(verify_login(username, password)):
-    #    print(session["id"])
-    #    print(session["username"])
-    #    print(session["admin"])
-    #    print(session["correo"])
-    #    return redirect('/')
-    #else:
-        #return render_template('login.html',form=a)        
-    #return render_template('login.html',form=a)
+@app.route("/contralang",methods=['POST','GET'])
+def recuperarContraend():
+    t=0
+    if 'recovery-timmer' in session:
+        t=session['recovery-timmer']
+    b=PasswordResetForm()
+    if (request.method == 'POST'):
+
+        if b.validate_on_submit():
+            if b.password.data==b.password_conf.data:
+                if verify_password(b.password.data):
+                    if 'recovery-email' in session:
+                        z=search_entry(session['recovery-email'],"email")
+                        if z!=None:
+                            if check_password_hash(z.event_value,b.recovery_token.data):
+                                z.password=generate_password_hash(b.password.data)
+                                db.session.commit()
+                                flash("Cambio de contraseña exitoso")
+                                return redirect("/login")
+                            else:
+                                flash("Token incorrecto")
+                                return render_template('RecoverToken.html',form_b=b,timer=t)
+                    elif 'recovery-usr' in session:
+                        z=search_entry(session['recovery-usr'])
+                        if z!=None:
+                            if check_password_hash(z.event_value,z.b.recovery_token.data):
+                                z.password=generate_password_hash(b.password.data)
+                                db.session.commit()
+                                flash("Cambio de contraseña exitoso")
+                                return redirect("/login")
+                            else:
+                                flash("Token incorrecto")
+                                return render_template('RecoverToken.html',form_b=b,timer=t)
+        return render_template('RecoverToken.html',form_b=b,timer=t)
+    elif (request.method == 'GET'):
+        return render_template('RecoverToken.html',form_b=b,timer=t)
 
 @app.route("/recuperarContra", methods=['POST','GET'])
 def recuperarContra():
-    if (request.method == 'GET'):
-        return render_template('recuperarContra.html')
-    elif (request.method == 'POST'):
-        try:
-            correo = None
-            token = None
-            TokenForm = None
-            correo = request.form['emailRecuperar']
-
-            if(correo != None and TokenForm == None):
-                r = re.search('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', correo)
-                if( r != None):
-                    token = str(random.randint(100000, 1000000))
-                    contents = [
-                        "Acabas de recibir un correo prueba",
-                        "El siguiente es tu token: ", token
-                    ]
-                    yag.send(correo, 'Recuperar contraseña', contents)
-                    flash("Token enviado (Puede llegar a tu carpeta de spam)")
-                    return render_template('recuperarContra.html')
-                else:
-                    flash("Correo no valido")
-                    return render_template('recuperarContra.html')
-            else:
-                pass1 = request.form['contra']
-                pass2 = request.form['contrac']
-                TokenForm = request.form['token']
-
-                if(pass1 == pass2):
-                    m = re.search('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', pass1)
-                    if(m != None ):
-                        if(token == TokenForm):
-                            flash("Cambio realizado!")
-                            return render_template('principal.html')
+    a=PasswordRecoveryForm()
+    if (request.method == 'POST'):
+        if a.validate_on_submit():
+            if a.email.data!=None or a.username.data!=None:
+                if a.email.data!=None and a.email.data!="":
+                    if verify_email(a.email.data):
+                        k=search_entry(a.email.data,"email")
+                        if k==None:
+                            flash("Este usuario no existe en el sistema")
+                            return render_template('recuperarContra.html',form_a=a)
                         else:
-                            flash("El token no corresponde al enviado")
-                            return render_template('recuperarContra.html')
+                            session['recovery-email']=a.email.data
+                            generate_token(a.email.data)
+                            session['recovery-timmer']=k.event_end
+                            return redirect("contralang")
+                elif verify_username(a.username.data):
+                    k=search_entry(a.username.data)
+                    if k==None:
+                        flash("Este usuario no existe en el sistema")
+                        return render_template('recuperarContra.html',form_a=a)
                     else:
-                        flash("La contraseña no cumple con los requisitos exigidos")
-                        return render_template('recuperarContra.html')
+                        session['recovery-usr']=a.username.data
+                        generate_token(a.username.data)
+                        session['recovery-timmer']=k.event_end
+                        return redirect("contralang")
                 else:
-                    flash("Las contraseñas no coinciden ")
-                    return render_template('recuperarContra.html')
-        except Exception as e:
-            print(e)
-            flash("Error en el envio de token")
-            return render_template('recuperarContra.html')
-
+                    flash("El usuario o el correo están escritos en un formato invalido")
+                    return render_template('recuperarContra.html',form_a=a) 
+            else:
+                flash("Debes escribir al menos uno de los dos campos para enviar el token al correo...")
+                return render_template('recuperarContra.html',form_a=a) 
+    elif (request.method == 'GET'):
+        return render_template('recuperarContra.html',form_a=a)
+        
 @app.route("/registro", methods=['POST','GET'])
 def registro():
     a = RegisterForm()

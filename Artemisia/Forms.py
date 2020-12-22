@@ -33,4 +33,10 @@ class ImageForm(FlaskForm):
     description = StringField('Descripción',validators=[Optional()] , widget=TextArea())
 
 class PasswordRecoveryForm(FlaskForm):
-    e=0
+    email=StringField("Email",validators=[Optional(),Regexp(email_pattern,message="El correo no posee formato válido. ")])
+    username=StringField("Nombre de usuario", validators=[Optional(),Regexp(usr_pattern,message="El usuario no puede contener simbolos. "),Length(min=MINIMAL_USERNAME_SIZE,message="La longitud debe ser mayor. ")])
+
+class PasswordResetForm(FlaskForm):
+    password=StringField("Nueva contraseña",validators=[DataRequired("Es obligatorio asignar una contraseña a la cuenta. "),Regexp(pw_pattern,message="Contraseña no válida. ")])
+    password_conf=StringField("Repetir nueva contraseña",validators=[DataRequired("Es obligatorio repetir una contraseña valida. "),Regexp(pw_pattern,message="Contraseña no válida. "),EqualTo('password',"Las contraseñas no coinciden. ")])
+    recovery_token=StringField("Token",validators=[DataRequired("Este campo nunca podrá ser nulo"),Regexp(token_pattern,message="No es un formato de token valido, debe tener 6 digitos")])

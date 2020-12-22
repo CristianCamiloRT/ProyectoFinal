@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+</head>
+
+<body>
+
+    <script type="text/javascript" src="../static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/js/popper.min.js"></script>
+    <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/js/includeHtml.js"></script>
+
+    <div w3-include-html="header.html"></div>
+
+    <script>includeHTML();</script>
+    <main role="main">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-warning" role="alert">
+            <span>{{ message }}</span>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span aria-hidden="true">&times;</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <style>
+            .required-field::after {
+                content: "*";
+                color: red;
+            }
+        </style>
+        <div class="album py-5 bg-light">
+            <div class="container">
+                <div class="card border-dark mb-3" style="max-width: 80rem;">
+                    <div class="card-header"><h2>Recuperar Contraseña</h2></div>
+                    <div class="card-body text-dark">
+                        <h5 class="card-title required-field">Diligencia toda la información requerida</h5><br><br>
+                        <form action="{{url_for('recuperarContraend')}}" method="POST">
+                            {{ form_b.hidden_tag() }}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label class="required-field">
+                                        {{form_b.password.label}}
+                                    </label>
+                                    {{form_b.password(type="password",class="form-control",placeholder="Nueva contraseña",required=true)}}
+                                    {% if form_b.errors.get('password') %}
+                                    <div style="color:red;">
+                                        {{ "".join(form_b.errors.get('password')) }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="required-field">
+                                        {{form_b.password_conf.label}}
+                                    </label>
+                                    {{form_b.password_conf(type="password",class="form-control",placeholder="Confirmación de nueva contraseña",required=true)}}
+                                    {% if form_b.errors.get('password_conf') %}
+                                    <div style="color:red;">
+                                        {{ "".join(form_b.errors.get('password_conf')) }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group">
+
+                                <label class="required-field">
+                                    {{form_b.recovery_token.label}}
+                                </label>
+                                <div class="row justify-content-center" id="demo">
+
+                                    <script>
+                                            // Set the date we're counting down to
+
+                                        var countDownDate = new Date("{{timer}}").getTime();
+
+                                            // Update the count down every 1 second
+                                            var x = setInterval(function () {
+
+                                                // Get today's date and time
+                                                var now = new Date().getTime();
+
+                                                // Find the distance between now and the count down date
+                                                var distance = countDownDate - now;
+
+                                                // Time calculations for days, hours, minutes and seconds
+                                                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                                // Display the result in the element with id="demo"
+                                                document.getElementById("demo").innerHTML = "Tiempo restante: " + days + "d " + hours + "h "
+                                                    + minutes + "m " + seconds + "s ";
+
+                                                // If the count down is finished, write some text
+                                                if (distance < 0) {
+                                                    clearInterval(x);
+                                                    document.getElementById("demo").innerHTML = "Ha expirado el token, solicita otro nuevamente";
+                                                }
+                                            }, 1000);
+                                    </script>
+
+
+                                </div>
+                                {{form_b.recovery_token(type="text",class="form-control",placeholder="Token",required=true)}}
+                            </div>
+                            {% if form_b.errors.get('recovery_token') %}
+                            <div style="color:red;">
+                                {{ "".join(form_b.errors.get('recovery_token')) }}
+                            </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-center align-items-center d-flex align-content-start flex-wrap">
+                                <button type="submit" class="btn btn-primary mb-1">Cambiar contraseña</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div w3-include-html="footer.html"></div>
+
+    <script>includeHTML();</script>
+</body>
+
+</html>

@@ -12,7 +12,9 @@ pw_pattern=re.compile("^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$")
 fecha_pattern=re.compile("^[-./\:?AMP \d]*$")
 title_img_pattern=re.compile("^(?![\s]+$)[a-zA-Z\s]*$")
 tag_img_pattern=re.compile("^(?![\s,]+$)[a-zA-Z\s,]*$")
+token_pattern=re.compile("^[0-9]{6}$")
 from flask import flash
+import datetime
 
 #err-id
 def verify_id(id):
@@ -141,3 +143,6 @@ def img_verify(data,flag="title"):
     if flag=='tags':
         state = state and img_verify_tags(data)
     return state
+
+def add_time(timestamp,seconds,minutes=0,hours=0,days=0):
+    datetime.datetime=()

@@ -83,14 +83,14 @@
     <Content Include="Artemisia\static\js\includeHtml.js" />
     <Content Include="Artemisia\static\js\jquery.min.js" />
     <Content Include="Artemisia\static\js\popper.min.js" />
-    <Content Include="Artemisia\templates\email.html" />
     <Content Include="Artemisia\templates\footer.html" />
     <Content Include="Artemisia\templates\header.html" />
     <Content Include="Artemisia\templates\login.html" />
     <Content Include="Artemisia\templates\misImagenes.html" />
     <Content Include="Artemisia\templates\principal.html" />
+    <Content Include="Artemisia\templates\RecoverT.html" />
+    <Content Include="Artemisia\templates\RecoverToken.html" />
     <Content Include="Artemisia\templates\recuperarContra.html" />
-    <Content Include="Artemisia\templates\recuperarContraOld.html" />
     <Content Include="Artemisia\templates\registro.html" />
     <Content Include="Artemisia\templates\subirImg.html" />
     <Content Include="Artemisia\templates\test.html" />

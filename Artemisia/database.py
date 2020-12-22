@@ -1,12 +1,17 @@
 import os
 from flask_sqlalchemy import SQLAlchemy #base de datos (es la libreria SQLalchemy de python totalmente compatible con flask)
-from flask import flash
+from sqlalchemy import and_, or_
+from flask import flash, session,render_template
 from werkzeug.security import generate_password_hash, check_password_hash #hashes criptograficamente seguros
 from Artemisia import Class
 from Artemisia import Generic
-from Artemisia import db
+from Artemisia import app,db,yag
 from Artemisia.Class import *
 from Artemisia.Generic import *
+import secrets
+import datetime
+from datetime import datetime , timedelta
+
 
 def add_user(Usuario,Contraseña,Email,Celular,**kwargs):
     state=True
@@ -42,12 +47,36 @@ def lower_fix(param):
 
 def get_user_id(data,flag='username'):
     if flag=='username':
-        return User.query.filter_by(username=data).first().id
+        a=User.query.filter_by(username=data).first()
+        if a!=None:
+            return User.query.filter_by(username=data).first().id
+        return None
     if flag=='email':
-        return User.query.filter_by(email=data).first().id
+        a=User.query.filter_by(email=data).first()
+        if a!=None:
+            return User.query.filter_by(email=data).first().id
+        return None
     if flag=='id':
         return data
     return None
+
+def send_recovery_email(email,info):
+    contents=render_template("RecoverT.html",token=info)
+    yag.send(email, 'Recuperar contraseña', contents)
+    flash("Token enviado (Puede llegar a tu carpeta de spam)")
+
+def generate_token(data,flag='username'):
+    a=100000+secrets.randbelow(899999)
+    entry=search_entry(data,flag)
+    if entry!=None:
+        send_recovery_email(entry.email,a)
+        entry.event_type="PASSWUP"
+        entry.event_description="Intento de recuperación de contraseña"
+        entry.event_value=generate_password_hash(str(a))
+        entry.event_init=datetime.now()
+        entry.event_end=datetime.now() + timedelta(minutes=10)
+        db.session.commit()
+        
 
 def delete_user(data,flag='username'):
     a=None
@@ -101,8 +130,16 @@ def save_file(file):
 def get_by_img_id(id):
     return Image.query.get(id)
 
+def get_usr_img():
+    if 'username' in session:
+        return Image.query.filter(Image.user_id==session['username']).all()
+    else:
+       return []
+
 def get_all_img():
-    return Image.query.all()
+    if 'username' in session:
+        return Image.query.filter(or_(Image.public==1,and_(Image.user_id==session['username'] , Image.public==0))).all()
+    return Image.query.filter(Image.public==1).all()
 
 def get_img(data, flag=None):
     if flag!=None and flag in ['user_id','binary','path','ext','name', 'public','description','tags','title','id']:
@@ -125,13 +162,20 @@ def add_img(title,tags,binary,description,public,user_id):
     a.user_id=user_id
     a.ext=os.path.splitext(binary.filename)[1]
     a.name=os.path.splitext(binary.filename)[0]
-    a.path="/static/images/"+a.name+a.ext
+    a.path=a.name+a.ext
     a.user_id=user_id
     if state:
         db.session.add(a)
         db.session.commit()
     return state
-      
+
+def search_img(tag):
+    if 'username' in session:
+        return Image.query.filter(and_(Image.tags.like(f"%{tag}%"), or_(Image.public == 1,and_(Image.user_id==session['username'],Image.public==0)))).all()
+    return Image.query.filter(and_(Image.tags.like(f"%{tag}%"),Image.public == 1)).all()
+
+
+
 #def add_img(**kwargs):
 #def insertar_imagen(link, titulo1, tags1, descripcion1, estado1, ruta1, user_id1): #inserta imagen params(objeto_db, titulo, tags, ..., clave_foranea_usuario) 
 #    try:
@@ -198,4 +242,3 @@ def add_img(title,tags,binary,description,public,user_id):
 #        print(error)
 #        return False
 #    return True
-    
